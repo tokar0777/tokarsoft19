@@ -14,7 +14,125 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      risk_rules: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          rule: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          rule: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          rule?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      setups: {
+        Row: {
+          confluences: string[]
+          created_at: string
+          description: string
+          id: string
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          confluences?: string[]
+          created_at?: string
+          description?: string
+          id?: string
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          confluences?: string[]
+          created_at?: string
+          description?: string
+          id?: string
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      trades: {
+        Row: {
+          category: string
+          chart_url: string | null
+          created_at: string
+          direction: string
+          entry_price: number | null
+          id: string
+          notes: string
+          outcome: string
+          pair: string
+          realized_r: number
+          setup_id: string | null
+          stop_loss: number | null
+          take_profit: number | null
+          traded_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          chart_url?: string | null
+          created_at?: string
+          direction: string
+          entry_price?: number | null
+          id?: string
+          notes?: string
+          outcome: string
+          pair: string
+          realized_r?: number
+          setup_id?: string | null
+          stop_loss?: number | null
+          take_profit?: number | null
+          traded_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          chart_url?: string | null
+          created_at?: string
+          direction?: string
+          entry_price?: number | null
+          id?: string
+          notes?: string
+          outcome?: string
+          pair?: string
+          realized_r?: number
+          setup_id?: string | null
+          stop_loss?: number | null
+          take_profit?: number | null
+          traded_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trades_setup_id_fkey"
+            columns: ["setup_id"]
+            isOneToOne: false
+            referencedRelation: "setups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
