@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.seed_new_trader() FROM PUBLIC, anon, authenticated;
