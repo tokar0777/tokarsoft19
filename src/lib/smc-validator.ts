@@ -86,9 +86,9 @@ export function analyzeSmc(seed: string): SmcAnalysis {
   const verdict: Verdict = pick === 0 ? "CONFIRMED" : pick === 2 ? "HIGH RISK" : "INVALIDATED";
 
   return {
-    structure: STRUCTURE[pick],
-    liquidity: LIQUIDITY[pick],
-    priceAction: PRICE_ACTION[pick],
+    structure: STRUCTURE[pick]!,
+    liquidity: LIQUIDITY[pick]!,
+    priceAction: PRICE_ACTION[pick]!,
     verdict,
     summary: SUMMARIES[verdict],
   };
