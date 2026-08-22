@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as JournalRouteImport } from './routes/journal'
 import { Route as RiskRouteImport } from './routes/risk'
+import { Route as ValidatorRouteImport } from './routes/validator'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -34,18 +35,25 @@ const RiskRoute = RiskRouteImport.update({
   path: '/risk',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ValidatorRoute = ValidatorRouteImport.update({
+  id: '/validator',
+  path: '/validator',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/journal': typeof JournalRoute
   '/risk': typeof RiskRoute
+  '/validator': typeof ValidatorRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/journal': typeof JournalRoute
   '/risk': typeof RiskRoute
+  '/validator': typeof ValidatorRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +61,14 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/journal': typeof JournalRoute
   '/risk': typeof RiskRoute
+  '/validator': typeof ValidatorRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/journal' | '/risk'
+  fullPaths: '/' | '/auth' | '/journal' | '/risk' | '/validator'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/journal' | '/risk'
-  id: '__root__' | '/' | '/auth' | '/journal' | '/risk'
+  to: '/' | '/auth' | '/journal' | '/risk' | '/validator'
+  id: '__root__' | '/' | '/auth' | '/journal' | '/risk' | '/validator'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,6 +76,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   JournalRoute: typeof JournalRoute
   RiskRoute: typeof RiskRoute
+  ValidatorRoute: typeof ValidatorRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -99,6 +109,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RiskRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/validator': {
+      id: '/validator'
+      path: '/validator'
+      fullPath: '/validator'
+      preLoaderRoute: typeof ValidatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -107,6 +124,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   JournalRoute: JournalRoute,
   RiskRoute: RiskRoute,
+  ValidatorRoute: ValidatorRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
