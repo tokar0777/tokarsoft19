@@ -159,9 +159,27 @@ export function AppShell({ title, subtitle, children }: { title: string; subtitl
           <button className="text-muted-foreground lg:hidden" onClick={() => setOpen(true)}>
             <Menu className="size-5" />
           </button>
-          <div>
-            <h1 className="text-lg font-semibold tracking-tight md:text-xl">{title}</h1>
-            {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
+          <div className="min-w-0">
+            <h1 className="truncate text-lg font-semibold tracking-tight md:text-xl">{title}</h1>
+            {subtitle && <p className="truncate text-xs text-muted-foreground">{subtitle}</p>}
+          </div>
+          <div className="ml-auto flex items-center gap-2">
+            <div className="hidden items-center gap-1 sm:flex">
+              {SOCIALS.map((s) => (
+                <a
+                  key={s.label}
+                  href={s.href}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  aria-label={s.label}
+                  title={s.label}
+                  className="flex size-8 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:text-primary"
+                >
+                  <s.icon className="size-4" />
+                </a>
+              ))}
+            </div>
+            <LanguageSelector />
           </div>
         </header>
         <main className="flex-1 px-4 py-6 md:px-8">{children}</main>
