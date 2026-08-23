@@ -30,13 +30,13 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Dashboard — Quant Trading Hub" },
+      { title: "Dashboard — TOKARsoft19" },
       {
         name: "description",
         content:
           "Smart Money Concepts trading analytics: win rate, realized R, equity curve and win/loss breakdown by asset class.",
       },
-      { property: "og:title", content: "Dashboard — Quant Trading Hub" },
+      { property: "og:title", content: "Dashboard — TOKARsoft19" },
       {
         property: "og:description",
         content: "SMC trading analytics: win rate, realized R and equity curve by asset class.",

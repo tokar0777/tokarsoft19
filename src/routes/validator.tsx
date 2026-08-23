@@ -11,13 +11,13 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/validator")({
   head: () => ({
     meta: [
-      { title: "SMC Validator Bot — Quant Trading Hub" },
+      { title: "SMC Validator Bot — TOKARsoft19" },
       {
         name: "description",
         content:
           "Validate a trade idea strictly with Smart Money Concepts: market structure, liquidity, POI and a final verdict.",
       },
-      { property: "og:title", content: "SMC Validator Bot — Quant Trading Hub" },
+      { property: "og:title", content: "SMC Validator Bot — TOKARsoft19" },
       {
         property: "og:description",
         content: "Strict ICT validation of your trade idea: structure, liquidity, POI, verdict.",

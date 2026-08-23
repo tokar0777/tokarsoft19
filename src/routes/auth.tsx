@@ -12,12 +12,12 @@ import { Label } from "@/components/ui/label";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign In — Quant Trading Hub" },
+      { title: "Sign In — TOKARsoft19" },
       {
         name: "description",
         content: "Access your Smart Money Concepts trading journal, analytics and SMC validator.",
       },
-      { property: "og:title", content: "Sign In — Quant Trading Hub" },
+      { property: "og:title", content: "Sign In — TOKARsoft19" },
       {
         property: "og:description",
         content: "Access your Smart Money Concepts trading journal, analytics and SMC validator.",
@@ -83,7 +83,7 @@ function AuthPage() {
             <Activity className="size-4" />
           </span>
           <div className="leading-tight">
-            <p className="text-sm font-semibold tracking-[0.18em]">QUANT</p>
+            <p className="text-sm font-semibold tracking-[0.14em]">TOKARsoft19</p>
             <p className="tabular text-[10px] tracking-[0.28em] text-muted-foreground">TRADING HUB</p>
           </div>
         </div>
