@@ -97,7 +97,7 @@ export function AppShell({ title, subtitle, children }: { title: string; subtitl
             <Activity className="size-4" />
           </span>
           <div className="leading-tight">
-            <p className="text-sm font-semibold tracking-[0.18em] text-sidebar-foreground">QUANT</p>
+            <p className="text-sm font-semibold tracking-[0.14em] text-sidebar-foreground">TOKARsoft19</p>
             <p className="tabular text-[10px] tracking-[0.28em] text-muted-foreground">TRADING HUB</p>
           </div>
           <button className="ml-auto text-muted-foreground lg:hidden" onClick={() => setOpen(false)}>
