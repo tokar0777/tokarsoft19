@@ -125,6 +125,22 @@ export function AppShell({ title, subtitle, children }: { title: string; subtitl
         </nav>
 
         <div className="border-t border-sidebar-border p-3">
+          <div className="flex items-center gap-2 pb-3">
+            {SOCIALS.map((s) => (
+              <a
+                key={s.label}
+                href={s.href}
+                target="_blank"
+                rel="noreferrer noopener"
+                aria-label={s.label}
+                title={s.label}
+                className="flex items-center gap-2 rounded-md border border-sidebar-border px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-primary"
+              >
+                <s.icon className="size-3.5" />
+                {s.label}
+              </a>
+            ))}
+          </div>
           <p className="truncate px-2 pb-2 text-xs text-muted-foreground">{user?.email}</p>
           <button
             onClick={async () => {
