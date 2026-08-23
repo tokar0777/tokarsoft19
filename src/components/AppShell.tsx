@@ -12,6 +12,51 @@ const NAV = [
   { to: "/risk", label: "Risk & Setups", icon: Shield },
 ] as const;
 
+const SOCIALS = [
+  { href: "https://t.me/tokartrading", label: "Telegram", icon: Send },
+  { href: "https://youtube.com/@tokarsss?si=Y3kig7daZaRmPxTi", label: "YouTube", icon: Youtube },
+] as const;
+
+const LANGS = ["UA", "RU", "EN"] as const;
+type Lang = (typeof LANGS)[number];
+
+function LanguageSelector() {
+  const [lang, setLang] = useState<Lang>("EN");
+
+  useEffect(() => {
+    const stored = localStorage.getItem("qth-lang");
+    if (stored && (LANGS as readonly string[]).includes(stored)) setLang(stored as Lang);
+  }, []);
+
+  return (
+    <div
+      role="group"
+      aria-label="Language selector"
+      className="flex items-center gap-0.5 rounded-md border border-border bg-surface p-0.5"
+    >
+      {LANGS.map((code) => (
+        <button
+          key={code}
+          type="button"
+          aria-pressed={lang === code}
+          onClick={() => {
+            setLang(code);
+            localStorage.setItem("qth-lang", code);
+          }}
+          className={cn(
+            "tabular rounded px-2 py-1 text-[11px] tracking-[0.12em] transition-colors",
+            lang === code
+              ? "bg-primary/15 text-primary"
+              : "text-muted-foreground hover:text-foreground",
+          )}
+        >
+          {code}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export function AppShell({ title, subtitle, children }: { title: string; subtitle?: string; children: ReactNode }) {
   const { session, loading, user } = useAuth();
   const navigate = useNavigate();
