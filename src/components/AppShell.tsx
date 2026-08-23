@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
-import { BarChart3, BookOpen, Bot, Shield, LogOut, Menu, X, Activity } from "lucide-react";
+import { BarChart3, BookOpen, Bot, Shield, LogOut, Menu, X, Activity, Send, Youtube } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
