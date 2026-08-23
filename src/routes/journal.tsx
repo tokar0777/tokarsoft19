@@ -23,13 +23,13 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/journal")({
   head: () => ({
     meta: [
-      { title: "Trade Log — Quant Trading Hub" },
+      { title: "Trade Log — TOKARsoft19" },
       {
         name: "description",
         content:
           "Log and review every SMC execution: pair, direction, setup, entry, stop, target, realized R and confluence notes.",
       },
-      { property: "og:title", content: "Trade Log — Quant Trading Hub" },
+      { property: "og:title", content: "Trade Log — TOKARsoft19" },
       {
         property: "og:description",
         content: "Log and review every Smart Money Concepts execution with full confluence notes.",

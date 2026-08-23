@@ -15,13 +15,13 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/risk")({
   head: () => ({
     meta: [
-      { title: "Risk & Setups — Quant Trading Hub" },
+      { title: "Risk & Setups — TOKARsoft19" },
       {
         name: "description",
         content:
           "Store your money-management rules and build a library of SMC setups with required confluence checklists.",
       },
-      { property: "og:title", content: "Risk & Setups — Quant Trading Hub" },
+      { property: "og:title", content: "Risk & Setups — TOKARsoft19" },
       {
         property: "og:description",
         content: "Money-management rules and a reusable Smart Money Concepts setup library.",
