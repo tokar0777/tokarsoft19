@@ -84,7 +84,7 @@ function AuthPage() {
           </span>
           <div className="leading-tight">
             <p className="text-sm font-semibold tracking-[0.14em]">TOKARsoft19</p>
-            <p className="tabular text-[10px] tracking-[0.28em] text-muted-foreground">TRADING HUB</p>
+            <p className="tabular text-[10px] tracking-[0.28em] text-muted-foreground">TOKARsoft19</p>
           </div>
         </div>
 
