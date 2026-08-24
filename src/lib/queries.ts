@@ -85,3 +85,65 @@ export function useDeleteRow(table: "trades" | "setups" | "risk_rules", key: str
     onSuccess: () => qc.invalidateQueries({ queryKey: [key] }),
   });
 }
+
+export type AccountStatus = "pending" | "approved" | "rejected";
+
+export type Profile = {
+  id: string;
+  email: string;
+  status: AccountStatus;
+  created_at: string;
+};
+
+export function useProfile(enabled: boolean) {
+  return useQuery({
+    queryKey: ["profile"],
+    enabled,
+    queryFn: async () => {
+      const { data: auth } = await supabase.auth.getUser();
+      const userId = auth.user?.id;
+      if (!userId) return null;
+
+      const [{ data: profile, error }, { data: roles, error: roleError }] = await Promise.all([
+        supabase.from("profiles").select("id,email,status,created_at").eq("id", userId).maybeSingle(),
+        supabase.from("user_roles").select("role").eq("user_id", userId),
+      ]);
+      if (error) throw error;
+      if (roleError) throw roleError;
+
+      return {
+        profile: (profile ?? null) as Profile | null,
+        isAdmin: (roles ?? []).some((r) => r.role === "admin"),
+      };
+    },
+  });
+}
+
+export function useAllProfiles(enabled: boolean) {
+  return useQuery({
+    queryKey: ["all_profiles"],
+    enabled,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id,email,status,created_at")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as Profile[];
+    },
+  });
+}
+
+export function useSetUserStatus() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: AccountStatus }) => {
+      const { error } = await supabase.from("profiles").update({ status }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["all_profiles"] });
+      qc.invalidateQueries({ queryKey: ["profile"] });
+    },
+  });
+}

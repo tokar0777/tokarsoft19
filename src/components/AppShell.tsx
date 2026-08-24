@@ -1,7 +1,8 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
-import { BarChart3, BookOpen, Bot, Shield, LogOut, Menu, X, Activity, Send, Youtube } from "lucide-react";
+import { BarChart3, BookOpen, Bot, Shield, LogOut, Menu, X, Activity, Send, Youtube, ShieldCheck, Clock } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useProfile } from "@/lib/queries";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -12,8 +13,11 @@ const NAV = [
   { to: "/risk", label: "Risk & Setups", icon: Shield },
 ] as const;
 
+const SUPPORT_TELEGRAM = "https://t.me/vadyaa_77";
+
 const SOCIALS = [
   { href: "https://t.me/tokartrading", label: "Telegram", icon: Send },
+  { href: SUPPORT_TELEGRAM, label: "Support", icon: Send },
   { href: "https://youtube.com/@tokarsss?si=Y3kig7daZaRmPxTi", label: "YouTube", icon: Youtube },
 ] as const;
 
@@ -57,10 +61,60 @@ function LanguageSelector() {
   );
 }
 
-export function AppShell({ title, subtitle, children }: { title: string; subtitle?: string; children: ReactNode }) {
+function PendingScreen({ status, onSignOut }: { status: "pending" | "rejected"; onSignOut: () => void }) {
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+      <div className="w-full max-w-md rounded-lg border border-border bg-surface p-8 text-center">
+        <span className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-primary/15 text-primary">
+          <Clock className="size-5" />
+        </span>
+        <h1 className="text-lg font-semibold tracking-tight">
+          {status === "rejected" ? "Доступ відхилено" : "Pending Approval"}
+        </h1>
+        <p className="mt-3 text-sm text-muted-foreground">
+          Ваш акаунт знаходиться на модерації. Для прискорення доступу напишіть адміністратору.
+        </p>
+        <a
+          href={SUPPORT_TELEGRAM}
+          target="_blank"
+          rel="noreferrer noopener"
+          className="mt-6 flex w-full items-center justify-center gap-2 rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
+        >
+          <Send className="size-4" /> Написати адміністратору
+        </a>
+        <button
+          onClick={onSignOut}
+          className="mt-3 w-full rounded-md border border-border px-4 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+        >
+          Sign out
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export function AppShell({
+  title,
+  subtitle,
+  children,
+  requireAdmin = false,
+}: {
+  title: string;
+  subtitle?: string;
+  children: ReactNode;
+  requireAdmin?: boolean;
+}) {
   const { session, loading, user } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
+  const { data: access, isLoading: accessLoading } = useProfile(!!session);
+  const isAdmin = !!access?.isAdmin;
+  const status = access?.profile?.status ?? "pending";
+
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    navigate({ to: "/auth" });
+  };
 
   useEffect(() => {
     if (!loading && !session) {
@@ -68,10 +122,26 @@ export function AppShell({ title, subtitle, children }: { title: string; subtitl
     }
   }, [loading, session, navigate]);
 
-  if (loading || !session) {
+  if (loading || !session || (session && accessLoading)) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="tabular text-sm text-muted-foreground">Loading terminal…</div>
+      </div>
+    );
+  }
+
+  if (!isAdmin && status !== "approved") {
+    return <PendingScreen status={status === "rejected" ? "rejected" : "pending"} onSignOut={signOut} />;
+  }
+
+  if (requireAdmin && !isAdmin) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background px-4">
+        <div className="w-full max-w-sm rounded-lg border border-border bg-surface p-8 text-center">
+          <h1 className="text-lg font-semibold">Access denied</h1>
+          <p className="mt-2 text-sm text-muted-foreground">This area is restricted to administrators.</p>
+          <Link to="/" className="mt-5 inline-block text-sm text-primary">Back to dashboard</Link>
+        </div>
       </div>
     );
   }
@@ -106,7 +176,7 @@ export function AppShell({ title, subtitle, children }: { title: string; subtitl
         </div>
 
         <nav className="flex-1 space-y-1 p-3">
-          {NAV.map((item) => (
+          {[...NAV, ...(isAdmin ? [{ to: "/admin", label: "Admin Panel", icon: ShieldCheck } as const] : [])].map((item) => (
             <Link
               key={item.to}
               to={item.to}
@@ -143,10 +213,7 @@ export function AppShell({ title, subtitle, children }: { title: string; subtitl
           </div>
           <p className="truncate px-2 pb-2 text-xs text-muted-foreground">{user?.email}</p>
           <button
-            onClick={async () => {
-              await supabase.auth.signOut();
-              navigate({ to: "/auth" });
-            }}
+            onClick={signOut}
             className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
           >
             <LogOut className="size-4" /> Sign out
