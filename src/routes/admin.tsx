@@ -5,6 +5,7 @@ import { AppShell } from "@/components/AppShell";
 import { useAuth } from "@/hooks/useAuth";
 import { useAllProfiles, useProfile, useSetUserStatus, type AccountStatus } from "@/lib/queries";
 import { Button } from "@/components/ui/button";
+import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/admin")({
@@ -30,6 +31,7 @@ const STATUS_STYLES: Record<AccountStatus, string> = {
 
 function AdminPage() {
   const { session } = useAuth();
+  const { t } = useI18n();
   const { data: access } = useProfile(!!session);
   const isAdmin = !!access?.isAdmin;
   const { data: users = [], isLoading } = useAllProfiles(isAdmin);
@@ -39,35 +41,35 @@ function AdminPage() {
     setStatus.mutate(
       { id, status },
       {
-        onSuccess: () => toast.success(status === "approved" ? "Access granted" : "Access rejected"),
+        onSuccess: () => toast.success(status === "approved" ? t("status.approved") : t("status.rejected")),
         onError: (e) => toast.error(e instanceof Error ? e.message : "Update failed"),
       },
     );
 
   return (
-    <AppShell requireAdmin title="Admin Panel" subtitle="Approve or reject terminal access requests">
+    <AppShell requireAdmin title={t("admin.title")} subtitle={t("admin.subtitle")}>
       <div className="overflow-hidden rounded-lg border border-border bg-surface">
         <table className="w-full min-w-[640px] text-sm">
           <thead>
             <tr className="border-b border-border text-left text-xs uppercase tracking-[0.14em] text-muted-foreground">
-              <th className="px-4 py-3 font-medium">Email</th>
-              <th className="px-4 py-3 font-medium">Registered</th>
-              <th className="px-4 py-3 font-medium">Status</th>
-              <th className="px-4 py-3 text-right font-medium">Actions</th>
+              <th className="px-4 py-3 font-medium">{t("admin.email")}</th>
+              <th className="px-4 py-3 font-medium">{t("admin.registered")}</th>
+              <th className="px-4 py-3 font-medium">{t("admin.status")}</th>
+              <th className="px-4 py-3 text-right font-medium">{t("admin.actions")}</th>
             </tr>
           </thead>
           <tbody>
             {isLoading && (
               <tr>
                 <td colSpan={4} className="px-4 py-8 text-center text-muted-foreground">
-                  Loading users…
+                  {t("shell.loading")}
                 </td>
               </tr>
             )}
             {!isLoading && users.length === 0 && (
               <tr>
                 <td colSpan={4} className="px-4 py-8 text-center text-muted-foreground">
-                  No registered users yet.
+                  —
                 </td>
               </tr>
             )}
@@ -84,7 +86,7 @@ function AdminPage() {
                       STATUS_STYLES[u.status],
                     )}
                   >
-                    {u.status}
+                    {t(`status.${u.status}`, u.status)}
                   </span>
                 </td>
                 <td className="px-4 py-3">
@@ -95,7 +97,7 @@ function AdminPage() {
                       disabled={u.status === "approved" || setStatus.isPending}
                       onClick={() => update(u.id, "approved")}
                     >
-                      <Check className="size-3.5" /> Approve
+                      <Check className="size-3.5" /> {t("admin.approve")}
                     </Button>
                     <Button
                       size="sm"
@@ -103,7 +105,7 @@ function AdminPage() {
                       disabled={u.status === "rejected" || setStatus.isPending}
                       onClick={() => update(u.id, "rejected")}
                     >
-                      <X className="size-3.5" /> Reject
+                      <X className="size-3.5" /> {t("admin.reject")}
                     </Button>
                   </div>
                 </td>

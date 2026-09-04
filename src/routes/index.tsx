@@ -25,6 +25,7 @@ import {
   winLossByCategory,
   type Timeframe,
 } from "@/lib/trading";
+import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
@@ -50,6 +51,7 @@ const FILTERS = ["All", ...CATEGORIES] as const;
 
 function DashboardPage() {
   const { session } = useAuth();
+  const { t } = useI18n();
   const { data: trades = [], isLoading } = useTrades(!!session);
   const [category, setCategory] = useState<string>("All");
   const [timeframe, setTimeframe] = useState<Timeframe>("Quarterly");
@@ -63,17 +65,19 @@ function DashboardPage() {
   const byCategory = useMemo(() => winLossByCategory(filtered), [filtered]);
 
   return (
-    <AppShell title="Dashboard / Statistics" subtitle="Performance analytics across your SMC executions">
+    <AppShell title={t("dash.title")} subtitle={t("dash.subtitle")}>
       <div className="mb-6 flex flex-col gap-3 rounded-lg border border-border bg-card p-3 md:flex-row md:items-center md:justify-between">
         <SegmentGroup
-          label="Asset class"
+          label={t("dash.assetClass")}
           options={FILTERS as unknown as string[]}
+          renderOption={(o) => (o === "All" ? t("f.All") : t(`cat.${o}`, o))}
           value={category}
           onChange={setCategory}
         />
         <SegmentGroup
-          label="Period"
+          label={t("dash.period")}
           options={TIMEFRAMES as unknown as string[]}
+          renderOption={(o) => t(`tf.${o}`, o)}
           value={timeframe}
           onChange={(v) => setTimeframe(v as Timeframe)}
         />
@@ -82,29 +86,29 @@ function DashboardPage() {
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard
           icon={Activity}
-          label="Total trades"
+          label={t("dash.totalTrades")}
           value={String(stats.total)}
           hint={`${stats.wins}W · ${stats.losses}L · ${stats.breakEven}BE`}
         />
         <MetricCard
           icon={Percent}
-          label="Win rate"
+          label={t("dash.winRate")}
           value={`${stats.winRate.toFixed(1)}%`}
-          hint="Excludes break-even trades"
+          hint={t("dash.winRateHint")}
           tone={stats.winRate >= 50 ? "long" : "short"}
         />
         <MetricCard
           icon={Sigma}
-          label="Total R realized"
+          label={t("dash.totalR")}
           value={formatR(stats.totalR)}
-          hint="Cumulative risk multiples"
+          hint={t("dash.totalRHint")}
           tone={stats.totalR >= 0 ? "long" : "short"}
         />
         <MetricCard
           icon={Target}
-          label="Average R / trade"
+          label={t("dash.avgR")}
           value={formatR(stats.avgR)}
-          hint="Expectancy per execution"
+          hint={t("dash.avgRHint")}
           tone={stats.avgR >= 0 ? "long" : "short"}
         />
       </div>
@@ -112,8 +116,8 @@ function DashboardPage() {
       <div className="mt-4 grid gap-4 lg:grid-cols-3">
         <div className="rounded-lg border border-border bg-card p-5 lg:col-span-2">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-sm font-semibold tracking-wide">Cumulative equity curve (R)</h2>
-            <span className="tabular text-xs text-muted-foreground">{filtered.length} trades</span>
+            <h2 className="text-sm font-semibold tracking-wide">{t("dash.equity")}</h2>
+            <span className="tabular text-xs text-muted-foreground">{filtered.length} {t("dash.trades")}</span>
           </div>
           {curve.length === 0 ? (
             <EmptyState loading={isLoading} />
@@ -153,7 +157,7 @@ function DashboardPage() {
         </div>
 
         <div className="rounded-lg border border-border bg-card p-5">
-          <h2 className="mb-4 text-sm font-semibold tracking-wide">Win / loss by asset class</h2>
+          <h2 className="mb-4 text-sm font-semibold tracking-wide">{t("dash.winLoss")}</h2>
           {filtered.length === 0 ? (
             <EmptyState loading={isLoading} />
           ) : (
@@ -185,16 +189,16 @@ function DashboardPage() {
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         <MetricCard
           icon={Trophy}
-          label="Best performing pair"
+          label={t("dash.bestPair")}
           value={stats.bestPair ?? "—"}
-          hint={stats.bestPair ? `${formatR(stats.bestPairR)} realized` : "No trades in range"}
+          hint={stats.bestPair ? `${formatR(stats.bestPairR)} ${t("dash.realized")}` : t("dash.noTradesRange")}
           tone="long"
         />
         <MetricCard
           icon={Trophy}
-          label="Best performing asset class"
+          label={t("dash.bestClass")}
           value={stats.bestCategory ?? "—"}
-          hint={stats.bestCategory ? `${formatR(stats.bestCategoryR)} realized` : "No trades in range"}
+          hint={stats.bestCategory ? `${formatR(stats.bestCategoryR)} ${t("dash.realized")}` : t("dash.noTradesRange")}
           tone="long"
         />
       </div>
@@ -207,11 +211,13 @@ function SegmentGroup({
   options,
   value,
   onChange,
+  renderOption,
 }: {
   label: string;
   options: string[];
   value: string;
   onChange: (v: string) => void;
+  renderOption?: (v: string) => string;
 }) {
   return (
     <div className="flex items-center gap-3">
@@ -230,7 +236,7 @@ function SegmentGroup({
                 : "text-muted-foreground hover:text-foreground",
             )}
           >
-            {opt}
+            {renderOption ? renderOption(opt) : opt}
           </button>
         ))}
       </div>
@@ -272,9 +278,10 @@ function MetricCard({
 }
 
 function EmptyState({ loading }: { loading: boolean }) {
+  const { t } = useI18n();
   return (
     <div className="flex h-72 items-center justify-center text-sm text-muted-foreground">
-      {loading ? "Loading data…" : "No trades match the current filters."}
+      {loading ? t("dash.loading") : t("dash.noMatch")}
     </div>
   );
 }

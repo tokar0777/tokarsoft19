@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/risk")({
@@ -33,6 +34,7 @@ export const Route = createFileRoute("/risk")({
 
 function RiskPage() {
   const { session } = useAuth();
+  const { t } = useI18n();
   const enabled = !!session;
   const { data: rules = [] } = useRiskRules(enabled);
   const { data: setups = [] } = useSetups(enabled);
@@ -52,7 +54,7 @@ function RiskPage() {
     if (!newRule.trim()) return;
     await upsertRule.mutateAsync({ rule: newRule.trim(), is_active: true });
     setNewRule("");
-    toast.success("Rule added");
+    toast.success(t("risk.ruleAdded"));
   }
 
   async function saveSetup(e: React.FormEvent) {
@@ -67,7 +69,7 @@ function RiskPage() {
         .map((c) => c.trim())
         .filter(Boolean),
     });
-    toast.success(editingId ? "Setup updated" : "Setup created");
+    toast.success(editingId ? t("risk.setupUpdated") : t("risk.setupCreated"));
     setEditingId(null);
     setName("");
     setDescription("");
@@ -75,12 +77,12 @@ function RiskPage() {
   }
 
   return (
-    <AppShell title="Risk & Setup Management" subtitle="Your rules of engagement and SMC playbook">
+    <AppShell title={t("risk.title")} subtitle={t("risk.subtitle")}>
       <div className="grid gap-4 lg:grid-cols-2">
         <section className="rounded-lg border border-border bg-card p-5">
-          <h2 className="text-sm font-semibold tracking-wide">Risk rules</h2>
+          <h2 className="text-sm font-semibold tracking-wide">{t("risk.rules")}</h2>
           <p className="mt-1 text-xs text-muted-foreground">
-            Check off the rules you are actively enforcing on this account.
+            {t("risk.rulesHint")}
           </p>
 
           <ul className="mt-4 space-y-2">
@@ -112,7 +114,7 @@ function RiskPage() {
               </li>
             ))}
             {rules.length === 0 && (
-              <li className="py-6 text-center text-sm text-muted-foreground">No rules yet.</li>
+              <li className="py-6 text-center text-sm text-muted-foreground">{t("risk.noRules")}</li>
             )}
           </ul>
 
@@ -120,7 +122,7 @@ function RiskPage() {
             <Input
               value={newRule}
               onChange={(e) => setNewRule(e.target.value)}
-              placeholder="Max 1% risk per trade"
+              placeholder={t("risk.rulePlaceholder")}
             />
             <Button type="submit" size="icon">
               <Plus className="size-4" />
@@ -130,29 +132,29 @@ function RiskPage() {
 
         <section className="rounded-lg border border-border bg-card p-5">
           <h2 className="text-sm font-semibold tracking-wide">
-            {editingId ? "Edit setup" : "New SMC setup"}
+            {editingId ? t("risk.editSetup") : t("risk.newSetup")}
           </h2>
           <form onSubmit={saveSetup} className="mt-4 space-y-3">
             <div className="space-y-2">
-              <Label className="text-xs text-muted-foreground">Setup name</Label>
+              <Label className="text-xs text-muted-foreground">{t("risk.setupName")}</Label>
               <Input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Judas Swing + FVG Entry"
+                placeholder={t("risk.setupNamePlaceholder")}
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-xs text-muted-foreground">Description</Label>
+              <Label className="text-xs text-muted-foreground">{t("risk.description")}</Label>
               <Textarea
                 rows={3}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="When and how this model is traded…"
+                placeholder={t("risk.descriptionPlaceholder")}
               />
             </div>
             <div className="space-y-2">
               <Label className="text-xs text-muted-foreground">
-                Required confluences (one per line)
+                {t("risk.confluences")}
               </Label>
               <Textarea
                 rows={4}
@@ -163,7 +165,7 @@ function RiskPage() {
             </div>
             <div className="flex gap-2">
               <Button type="submit" disabled={upsertSetup.isPending}>
-                {editingId ? "Update setup" : "Create setup"}
+                {editingId ? t("risk.update") : t("risk.create")}
               </Button>
               {editingId && (
                 <Button
@@ -176,7 +178,7 @@ function RiskPage() {
                     setConfluences("");
                   }}
                 >
-                  <X className="size-4" /> Cancel
+                  <X className="size-4" /> {t("risk.cancel")}
                 </Button>
               )}
             </div>
@@ -185,7 +187,7 @@ function RiskPage() {
       </div>
 
       <section className="mt-4">
-        <h2 className="mb-3 text-sm font-semibold tracking-wide">SMC setups library</h2>
+        <h2 className="mb-3 text-sm font-semibold tracking-wide">{t("risk.library")}</h2>
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {setups.map((s) => (
             <article key={s.id} className="rounded-lg border border-border bg-card p-5">
@@ -202,7 +204,7 @@ function RiskPage() {
                       window.scrollTo({ top: 0, behavior: "smooth" });
                     }}
                   >
-                    Edit
+                    {t("risk.editAction")}
                   </button>
                   <button
                     className="text-muted-foreground transition-colors hover:text-short"
@@ -224,7 +226,7 @@ function RiskPage() {
             </article>
           ))}
           {setups.length === 0 && (
-            <p className="text-sm text-muted-foreground">No setups saved yet.</p>
+            <p className="text-sm text-muted-foreground">{t("risk.noSetups")}</p>
           )}
         </div>
       </section>
