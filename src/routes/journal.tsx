@@ -18,6 +18,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/journal")({
@@ -77,6 +78,7 @@ const emptyForm = (): FormState => ({
 
 function JournalPage() {
   const { session } = useAuth();
+  const { t: tr } = useI18n();
   const { data: trades = [], isLoading } = useTrades(!!session);
   const { data: setups = [] } = useSetups(!!session);
   const upsert = useUpsertRow("trades", "trades");
@@ -131,16 +133,16 @@ function JournalPage() {
         chart_url: form.chart_url.trim() || null,
         outcome: form.outcome,
       });
-      toast.success(form.id ? "Trade updated" : "Trade logged");
+      toast.success(form.id ? tr("journal.updated") : tr("journal.saved"));
       setOpen(false);
       setForm(emptyForm());
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Could not save trade");
+      toast.error(err instanceof Error ? err.message : tr("journal.saveError"));
     }
   }
 
   return (
-    <AppShell title="Trade Log" subtitle="Every execution, its confluences and its outcome">
+    <AppShell title={tr("journal.title")} subtitle={tr("journal.subtitle")}>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap gap-1 rounded-md bg-muted p-1">
           {["All", ...OUTCOMES].map((o) => (
@@ -154,7 +156,7 @@ function JournalPage() {
                   : "text-muted-foreground hover:text-foreground",
               )}
             >
-              {o}
+              {o === "All" ? tr("f.All") : tr(`out.${o}`, o)}
             </button>
           ))}
         </div>
@@ -164,7 +166,7 @@ function JournalPage() {
             setOpen(true);
           }}
         >
-          <Plus className="size-4" /> Add new trade
+          <Plus className="size-4" /> {tr("journal.add")}
         </Button>
       </div>
 
@@ -172,16 +174,16 @@ function JournalPage() {
         <table className="w-full min-w-[900px] text-sm">
           <thead>
             <tr className="border-b border-border text-left text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-              <th className="px-4 py-3 font-medium">Date</th>
-              <th className="px-4 py-3 font-medium">Pair</th>
-              <th className="px-4 py-3 font-medium">Class</th>
-              <th className="px-4 py-3 font-medium">Side</th>
-              <th className="px-4 py-3 font-medium">Setup</th>
-              <th className="px-4 py-3 font-medium">Entry / SL / TP</th>
+              <th className="px-4 py-3 font-medium">{tr("journal.col.date")}</th>
+              <th className="px-4 py-3 font-medium">{tr("journal.col.pair")}</th>
+              <th className="px-4 py-3 font-medium">{tr("journal.col.class")}</th>
+              <th className="px-4 py-3 font-medium">{tr("journal.col.side")}</th>
+              <th className="px-4 py-3 font-medium">{tr("journal.col.setup")}</th>
+              <th className="px-4 py-3 font-medium">{tr("journal.col.prices")}</th>
               <th className="px-4 py-3 font-medium">R</th>
-              <th className="px-4 py-3 font-medium">Outcome</th>
-              <th className="px-4 py-3 font-medium">Chart</th>
-              <th className="px-4 py-3 text-right font-medium">Actions</th>
+              <th className="px-4 py-3 font-medium">{tr("journal.col.outcome")}</th>
+              <th className="px-4 py-3 font-medium">{tr("journal.col.chart")}</th>
+              <th className="px-4 py-3 text-right font-medium">{tr("journal.col.actions")}</th>
             </tr>
           </thead>
           <tbody>
@@ -196,7 +198,7 @@ function JournalPage() {
                   })}
                 </td>
                 <td className="tabular px-4 py-3 font-medium">{t.pair}</td>
-                <td className="px-4 py-3 text-xs text-muted-foreground">{t.category}</td>
+                <td className="px-4 py-3 text-xs text-muted-foreground">{tr(`cat.${t.category}`, t.category)}</td>
                 <td className="px-4 py-3">
                   <span
                     className={cn(
@@ -206,7 +208,7 @@ function JournalPage() {
                         : "bg-short/15 text-short",
                     )}
                   >
-                    {t.direction}
+                    {tr(`dir.${t.direction}`, t.direction)}
                   </span>
                 </td>
                 <td className="px-4 py-3 text-xs">
@@ -241,7 +243,7 @@ function JournalPage() {
                       t.outcome === "Break-Even" && "bg-muted text-muted-foreground",
                     )}
                   >
-                    {t.outcome}
+                    {tr(`out.${t.outcome}`, t.outcome)}
                   </span>
                 </td>
                 <td className="px-4 py-3">
@@ -252,7 +254,7 @@ function JournalPage() {
                       rel="noreferrer"
                       className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
                     >
-                      View <ExternalLink className="size-3" />
+                      {tr("journal.view")} <ExternalLink className="size-3" />
                     </a>
                   ) : (
                     <span className="text-xs text-muted-foreground">—</span>
@@ -268,7 +270,7 @@ function JournalPage() {
                       variant="ghost"
                       onClick={async () => {
                         await remove.mutateAsync(t.id);
-                        toast.success("Trade deleted");
+                        toast.success(tr("journal.deleted"));
                       }}
                     >
                       <Trash2 className="size-4 text-short" />
@@ -280,7 +282,7 @@ function JournalPage() {
             {visible.length === 0 && (
               <tr>
                 <td colSpan={10} className="px-4 py-12 text-center text-sm text-muted-foreground">
-                  {isLoading ? "Loading trades…" : "No trades logged yet."}
+                  {isLoading ? tr("journal.loading") : tr("journal.empty")}
                 </td>
               </tr>
             )}
@@ -291,12 +293,12 @@ function JournalPage() {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
           <DialogHeader>
-            <DialogTitle>{form.id ? "Edit trade" : "Add new trade"}</DialogTitle>
-            <DialogDescription>Record the execution and its SMC confluences.</DialogDescription>
+            <DialogTitle>{form.id ? tr("journal.edit") : tr("journal.add")}</DialogTitle>
+            <DialogDescription>{tr("journal.modalDesc")}</DialogDescription>
           </DialogHeader>
           <form onSubmit={save} className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Date & time">
+              <Field label={tr("journal.field.datetime")}>
                 <Input
                   type="datetime-local"
                   required
@@ -304,14 +306,15 @@ function JournalPage() {
                   onChange={(e) => setForm({ ...form, traded_at: e.target.value })}
                 />
               </Field>
-              <Field label="Asset category">
+              <Field label={tr("journal.field.category")}>
                 <NativeSelect
                   value={form.category}
                   onChange={(v) => setForm({ ...form, category: v })}
                   options={[...CATEGORIES]}
+                  labels={Object.fromEntries(CATEGORIES.map((c) => [c, tr(`cat.${c}`, c)]))}
                 />
               </Field>
-              <Field label="Trading pair">
+              <Field label={tr("journal.field.pair")}>
                 <Input
                   required
                   placeholder="EUR/USD, XAU/USD, BTC/USDT"
@@ -319,51 +322,53 @@ function JournalPage() {
                   onChange={(e) => setForm({ ...form, pair: e.target.value })}
                 />
               </Field>
-              <Field label="Position type">
+              <Field label={tr("journal.field.direction")}>
                 <NativeSelect
                   value={form.direction}
                   onChange={(v) => setForm({ ...form, direction: v })}
                   options={[...DIRECTIONS]}
+                  labels={Object.fromEntries(DIRECTIONS.map((d) => [d, tr(`dir.${d}`, d)]))}
                 />
               </Field>
-              <Field label="Setup">
+              <Field label={tr("journal.field.setup")}>
                 <NativeSelect
                   value={form.setup_id}
                   onChange={(v) => setForm({ ...form, setup_id: v })}
                   options={setups.map((s) => s.id)}
                   labels={Object.fromEntries(setups.map((s) => [s.id, s.name]))}
-                  placeholder="No setup selected"
+                  placeholder={tr("journal.noSetup")}
                 />
               </Field>
-              <Field label="Trade outcome">
+              <Field label={tr("journal.field.outcome")}>
                 <NativeSelect
                   value={form.outcome}
                   onChange={(v) => setForm({ ...form, outcome: v })}
                   options={[...OUTCOMES]}
+                  labels={Object.fromEntries(OUTCOMES.map((o) => [o, tr(`out.${o}`, o)]))}
                 />
               </Field>
-              <Field label="Entry price">
+              <Field label={tr("journal.field.entry")}>
                 <Input
                   inputMode="decimal"
                   value={form.entry_price}
                   onChange={(e) => setForm({ ...form, entry_price: e.target.value })}
                 />
               </Field>
-              <Field label="Stop loss">
+              <Field label={tr("journal.field.sl")}>
                 <Input
                   inputMode="decimal"
                   value={form.stop_loss}
                   onChange={(e) => setForm({ ...form, stop_loss: e.target.value })}
                 />
               </Field>
-              <Field label="Take profit">
+              <Field label={tr("journal.field.tp")}>
                 <Input
                   inputMode="decimal"
                   value={form.take_profit}
                   onChange={(e) => setForm({ ...form, take_profit: e.target.value })}
                 />
               </Field>
-              <Field label="Realized R:R (e.g. 2.5 or -1)">
+              <Field label={tr("journal.field.r")}>
                 <Input
                   inputMode="decimal"
                   value={form.realized_r}
@@ -371,7 +376,7 @@ function JournalPage() {
                 />
               </Field>
             </div>
-            <Field label="TradingView chart URL">
+            <Field label={tr("journal.field.url")}>
               <Input
                 type="url"
                 placeholder="https://www.tradingview.com/chart/…"
@@ -379,20 +384,20 @@ function JournalPage() {
                 onChange={(e) => setForm({ ...form, chart_url: e.target.value })}
               />
             </Field>
-            <Field label="Trade reason / confluence notes">
+            <Field label={tr("journal.field.notes")}>
               <Textarea
                 rows={4}
-                placeholder="Liquidity swept, displacement, FVG entry, HTF bias…"
+                placeholder={tr("journal.notesPlaceholder")}
                 value={form.notes}
                 onChange={(e) => setForm({ ...form, notes: e.target.value })}
               />
             </Field>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-                Cancel
+                {tr("journal.cancel")}
               </Button>
               <Button type="submit" disabled={upsert.isPending}>
-                {upsert.isPending ? "Saving…" : "Save trade"}
+                {upsert.isPending ? tr("journal.saving") : tr("journal.save")}
               </Button>
             </DialogFooter>
           </form>
