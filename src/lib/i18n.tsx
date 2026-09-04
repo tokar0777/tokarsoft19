@@ -24,7 +24,7 @@ const EN: Dict = {
   "shell.backToDashboard": "Back to dashboard",
   "pending.title": "Pending Approval",
   "pending.rejected": "Access rejected",
-  "pending.body": "Ваш акаунт знаходиться на модерації. Для прискорення доступу напишіть адміністратору.",
+  "pending.body": "Your account is under moderation. To speed up access, message the administrator.",
   "pending.cta": "Message the administrator",
 
   // dashboard
