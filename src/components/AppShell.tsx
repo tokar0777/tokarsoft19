@@ -4,38 +4,31 @@ import { BarChart3, BookOpen, Bot, Shield, LogOut, Menu, X, Activity, Send, Yout
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/lib/queries";
 import { supabase } from "@/integrations/supabase/client";
+import { LANGS, useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 const NAV = [
-  { to: "/", label: "Dashboard", icon: BarChart3 },
-  { to: "/journal", label: "Trade Log", icon: BookOpen },
-  { to: "/validator", label: "SMC Validator", icon: Bot },
-  { to: "/risk", label: "Risk & Setups", icon: Shield },
+  { to: "/", labelKey: "nav.dashboard", icon: BarChart3 },
+  { to: "/journal", labelKey: "nav.journal", icon: BookOpen },
+  { to: "/validator", labelKey: "nav.validator", icon: Bot },
+  { to: "/risk", labelKey: "nav.risk", icon: Shield },
 ] as const;
 
 const SUPPORT_TELEGRAM = "https://t.me/vadyaa_77";
 
 const SOCIALS = [
-  { href: "https://t.me/tokartrading", label: "Telegram", icon: Send },
-  { href: SUPPORT_TELEGRAM, label: "Support", icon: Send },
-  { href: "https://youtube.com/@tokarsss?si=Y3kig7daZaRmPxTi", label: "YouTube", icon: Youtube },
+  { href: "https://t.me/tokartrading", labelKey: "shell.telegram", icon: Send },
+  { href: SUPPORT_TELEGRAM, labelKey: "shell.support", icon: Send },
+  { href: "https://youtube.com/@tokarsss?si=Y3kig7daZaRmPxTi", labelKey: "shell.youtube", icon: Youtube },
 ] as const;
 
-const LANGS = ["UA", "RU", "EN"] as const;
-type Lang = (typeof LANGS)[number];
-
 function LanguageSelector() {
-  const [lang, setLang] = useState<Lang>("EN");
-
-  useEffect(() => {
-    const stored = localStorage.getItem("qth-lang");
-    if (stored && (LANGS as readonly string[]).includes(stored)) setLang(stored as Lang);
-  }, []);
+  const { lang, setLang, t } = useI18n();
 
   return (
     <div
       role="group"
-      aria-label="Language selector"
+      aria-label={t("shell.language")}
       className="flex items-center gap-0.5 rounded-md border border-border bg-surface p-0.5"
     >
       {LANGS.map((code) => (
@@ -43,10 +36,7 @@ function LanguageSelector() {
           key={code}
           type="button"
           aria-pressed={lang === code}
-          onClick={() => {
-            setLang(code);
-            localStorage.setItem("qth-lang", code);
-          }}
+          onClick={() => setLang(code)}
           className={cn(
             "tabular rounded px-2 py-1 text-[11px] tracking-[0.12em] transition-colors",
             lang === code
@@ -62,6 +52,7 @@ function LanguageSelector() {
 }
 
 function PendingScreen({ status, onSignOut }: { status: "pending" | "rejected"; onSignOut: () => void }) {
+  const { t } = useI18n();
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-md rounded-lg border border-border bg-surface p-8 text-center">
@@ -69,24 +60,22 @@ function PendingScreen({ status, onSignOut }: { status: "pending" | "rejected"; 
           <Clock className="size-5" />
         </span>
         <h1 className="text-lg font-semibold tracking-tight">
-          {status === "rejected" ? "Доступ відхилено" : "Pending Approval"}
+          {status === "rejected" ? t("pending.rejected") : t("pending.title")}
         </h1>
-        <p className="mt-3 text-sm text-muted-foreground">
-          Ваш акаунт знаходиться на модерації. Для прискорення доступу напишіть адміністратору.
-        </p>
+        <p className="mt-3 text-sm text-muted-foreground">{t("pending.body")}</p>
         <a
           href={SUPPORT_TELEGRAM}
           target="_blank"
           rel="noreferrer noopener"
           className="mt-6 flex w-full items-center justify-center gap-2 rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
         >
-          <Send className="size-4" /> Написати адміністратору
+          <Send className="size-4" /> {t("pending.cta")}
         </a>
         <button
           onClick={onSignOut}
           className="mt-3 w-full rounded-md border border-border px-4 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
-          Sign out
+          {t("shell.signOut")}
         </button>
       </div>
     </div>
@@ -105,6 +94,7 @@ export function AppShell({
   requireAdmin?: boolean;
 }) {
   const { session, loading, user } = useAuth();
+  const { t } = useI18n();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const { data: access, isLoading: accessLoading } = useProfile(!!session);
@@ -125,7 +115,7 @@ export function AppShell({
   if (loading || !session || (session && accessLoading)) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="tabular text-sm text-muted-foreground">Loading terminal…</div>
+        <div className="tabular text-sm text-muted-foreground">{t("shell.loading")}</div>
       </div>
     );
   }
@@ -138,9 +128,11 @@ export function AppShell({
     return (
       <div className="flex min-h-screen items-center justify-center bg-background px-4">
         <div className="w-full max-w-sm rounded-lg border border-border bg-surface p-8 text-center">
-          <h1 className="text-lg font-semibold">Access denied</h1>
-          <p className="mt-2 text-sm text-muted-foreground">This area is restricted to administrators.</p>
-          <Link to="/" className="mt-5 inline-block text-sm text-primary">Back to dashboard</Link>
+          <h1 className="text-lg font-semibold">{t("shell.accessDenied")}</h1>
+          <p className="mt-2 text-sm text-muted-foreground">{t("shell.adminOnly")}</p>
+          <Link to="/" className="mt-5 inline-block text-sm text-primary">
+            {t("shell.backToDashboard")}
+          </Link>
         </div>
       </div>
     );
@@ -176,7 +168,7 @@ export function AppShell({
         </div>
 
         <nav className="flex-1 space-y-1 p-3">
-          {[...NAV, ...(isAdmin ? [{ to: "/admin", label: "Admin Panel", icon: ShieldCheck } as const] : [])].map((item) => (
+          {[...NAV, ...(isAdmin ? [{ to: "/admin", labelKey: "nav.admin", icon: ShieldCheck } as const] : [])].map((item) => (
             <Link
               key={item.to}
               to={item.to}
@@ -189,7 +181,7 @@ export function AppShell({
               }}
             >
               <item.icon className="size-4" />
-              {item.label}
+              {t(item.labelKey)}
             </Link>
           ))}
         </nav>
@@ -198,16 +190,16 @@ export function AppShell({
           <div className="flex items-center gap-2 pb-3">
             {SOCIALS.map((s) => (
               <a
-                key={s.label}
+                key={s.labelKey}
                 href={s.href}
                 target="_blank"
                 rel="noreferrer noopener"
-                aria-label={s.label}
-                title={s.label}
+                aria-label={t(s.labelKey)}
+                title={t(s.labelKey)}
                 className="flex items-center gap-2 rounded-md border border-sidebar-border px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-primary"
               >
                 <s.icon className="size-3.5" />
-                {s.label}
+                {t(s.labelKey)}
               </a>
             ))}
           </div>
@@ -216,7 +208,7 @@ export function AppShell({
             onClick={signOut}
             className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
           >
-            <LogOut className="size-4" /> Sign out
+            <LogOut className="size-4" /> {t("shell.signOut")}
           </button>
         </div>
       </aside>
@@ -234,12 +226,12 @@ export function AppShell({
             <div className="hidden items-center gap-1 sm:flex">
               {SOCIALS.map((s) => (
                 <a
-                  key={s.label}
+                  key={s.labelKey}
                   href={s.href}
                   target="_blank"
                   rel="noreferrer noopener"
-                  aria-label={s.label}
-                  title={s.label}
+                  aria-label={t(s.labelKey)}
+                  title={t(s.labelKey)}
                   className="flex size-8 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:text-primary"
                 >
                   <s.icon className="size-4" />
