@@ -1,8 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useRef, useState } from "react";
-import { ImageUp, Link2, Send, ShieldCheck, ShieldAlert, ShieldX, X } from "lucide-react";
+import { ImageUp, Link2, Send, ShieldCheck, ShieldAlert, ShieldX, X, Crosshair } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
-import { analyzeSmc, type SmcAnalysis } from "@/lib/smc-validator";
+import { analyzeSmcChart } from "@/lib/smc.functions";
+import type { SmcAnalysis } from "@/lib/smc-engine";
+import { useI18n } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -33,9 +36,12 @@ type Entry = {
   image: string | null;
   chartUrl: string | null;
   analysis: SmcAnalysis | null;
+  error: string | null;
 };
 
 function ValidatorPage() {
+  const { t, lang } = useI18n();
+  const analyze = useServerFn(analyzeSmcChart);
   const [entries, setEntries] = useState<Entry[]>([]);
   const [prompt, setPrompt] = useState("");
   const [chartUrl, setChartUrl] = useState("");
@@ -56,10 +62,11 @@ function ValidatorPage() {
     const id = crypto.randomUUID();
     const entry: Entry = {
       id,
-      prompt: prompt.trim() || "Validate this chart against the SMC model.",
+      prompt: prompt.trim() || t("val.defaultPrompt"),
       image,
       chartUrl: chartUrl.trim() || null,
       analysis: null,
+      error: null,
     };
     setEntries((prev) => [...prev, entry]);
     setPrompt("");
@@ -67,18 +74,26 @@ function ValidatorPage() {
     setImage(null);
     setBusy(true);
 
-    const seed = `${entry.prompt}|${entry.chartUrl ?? ""}|${entry.image ? entry.image.length : 0}`;
-    await new Promise((r) => setTimeout(r, 900));
-    const analysis = analyzeSmc(seed);
-    setEntries((prev) => prev.map((x) => (x.id === id ? { ...x, analysis } : x)));
-    setBusy(false);
+    try {
+      const analysis = await analyze({
+        data: {
+          prompt: entry.prompt,
+          chartUrl: entry.chartUrl,
+          image: entry.image,
+          lang,
+        },
+      });
+      setEntries((prev) => prev.map((x) => (x.id === id ? { ...x, analysis } : x)));
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      setEntries((prev) => prev.map((x) => (x.id === id ? { ...x, error: message } : x)));
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
-    <AppShell
-      title="SMC Validator Bot"
-      subtitle="Strict ICT evaluation — no indicators, no trendlines, no classical patterns"
-    >
+    <AppShell title={t("val.title")} subtitle={t("val.subtitle")}>
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
         <div className="flex min-h-[60vh] flex-col rounded-lg border border-border bg-card">
           <div className="flex-1 space-y-6 overflow-y-auto p-5">
@@ -87,11 +102,8 @@ function ValidatorPage() {
                 <span className="mb-3 flex size-12 items-center justify-center rounded-lg bg-primary/15 text-primary">
                   <ShieldCheck className="size-6" />
                 </span>
-                <p className="text-sm font-medium">Drop a TradingView screenshot or paste a chart link</p>
-                <p className="mt-1 max-w-sm text-xs text-muted-foreground">
-                  The bot grades your idea on market structure, liquidity and points of interest,
-                  then returns a verdict. Analysis is simulated until a model key is attached.
-                </p>
+                <p className="text-sm font-medium">{t("val.emptyTitle")}</p>
+                <p className="mt-1 max-w-sm text-xs text-muted-foreground">{t("val.emptyBody")}</p>
               </div>
             )}
 
@@ -115,10 +127,12 @@ function ValidatorPage() {
 
                 {entry.analysis ? (
                   <AnalysisBlock analysis={entry.analysis} />
-                ) : (
-                  <p className="animate-pulse text-sm text-muted-foreground">
-                    Reading structure, liquidity and PD arrays…
+                ) : entry.error ? (
+                  <p className="rounded-lg border border-short/40 bg-short/10 p-3 text-xs text-short">
+                    {t("val.error")}: {entry.error}
                   </p>
+                ) : (
+                  <p className="animate-pulse text-sm text-muted-foreground">{t("val.thinking")}</p>
                 )}
               </div>
             ))}
@@ -141,7 +155,7 @@ function ValidatorPage() {
               rows={2}
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
-              placeholder="EUR/USD long from the London FVG after the Asian low sweep — valid?"
+              placeholder={t("val.promptPlaceholder")}
             />
             <div className="flex items-center gap-2">
               <div className="relative flex-1">
@@ -150,7 +164,7 @@ function ValidatorPage() {
                   className="pl-9"
                   value={chartUrl}
                   onChange={(e) => setChartUrl(e.target.value)}
-                  placeholder="TradingView chart URL"
+                  placeholder={t("val.urlPlaceholder")}
                 />
               </div>
               <Button type="submit" size="icon" disabled={busy}>
@@ -180,8 +194,8 @@ function ValidatorPage() {
             )}
           >
             <ImageUp className="mb-2 size-6 text-muted-foreground" />
-            <p className="text-sm font-medium">Drop chart screenshot</p>
-            <p className="mt-1 text-xs text-muted-foreground">PNG or JPG from TradingView</p>
+            <p className="text-sm font-medium">{t("val.dropTitle")}</p>
+            <p className="mt-1 text-xs text-muted-foreground">{t("val.dropHint")}</p>
             <input
               ref={fileRef}
               type="file"
@@ -195,12 +209,13 @@ function ValidatorPage() {
           </div>
 
           <div className="rounded-lg border border-border bg-card p-5">
-            <h2 className="text-sm font-semibold tracking-wide">Model scope</h2>
+            <h2 className="text-sm font-semibold tracking-wide">{t("val.scope")}</h2>
             <ul className="mt-3 space-y-2 text-xs text-muted-foreground">
-              <li>Market structure: BOS, ChoCh, HTF delivery</li>
-              <li>Liquidity: internal / external sweeps, SMT</li>
-              <li>POI: FVG, order block, breaker, premium/discount</li>
-              <li className="text-short">Ignored: indicators, trendlines, chart patterns</li>
+              <li>{t("val.scope1")}</li>
+              <li>{t("val.scope2")}</li>
+              <li>{t("val.scope3")}</li>
+              <li>{t("val.scope4")}</li>
+              <li className="text-short">{t("val.scope5")}</li>
             </ul>
           </div>
         </div>
@@ -219,35 +234,67 @@ const VERDICT_META = {
 } as const;
 
 function AnalysisBlock({ analysis }: { analysis: SmcAnalysis }) {
+  const { t } = useI18n();
   const meta = VERDICT_META[analysis.verdict];
   const Icon = meta.icon;
   return (
     <div className="space-y-4 text-sm">
-      <Section index="01" title="Market structure check" items={analysis.structure} />
-      <Section index="02" title="Liquidity analysis" items={analysis.liquidity} />
-      <Section index="03" title="Price action & POI" items={analysis.priceAction} />
+      <div className="flex flex-wrap gap-2 text-[11px] text-muted-foreground">
+        <span className="rounded border border-border px-2 py-1">
+          {t("val.asset")}: <span className="text-foreground">{analysis.asset}</span>
+        </span>
+        <span className="rounded border border-border px-2 py-1">
+          {t("val.session")}: <span className="text-foreground">{analysis.session}</span>
+        </span>
+        <span className="rounded border border-border px-2 py-1">
+          {t("val.bias")}: <span className="text-foreground">{analysis.bias}</span>
+        </span>
+      </div>
+      <Section index="01" title={t("val.s1")} items={analysis.structure} />
+      <Section index="02" title={t("val.s2")} items={analysis.liquidity} />
+      <Section index="03" title={t("val.s3")} items={analysis.priceAction} />
       <div className={cn("rounded-lg border p-4", meta.className)}>
         <div className="flex items-center gap-2">
           <Icon className="size-4" />
-          <span className="tabular text-xs uppercase tracking-[0.2em]">Final verdict</span>
+          <span className="tabular text-xs uppercase tracking-[0.2em]">{t("val.verdict")}</span>
           <span className="ml-auto text-sm font-semibold">{analysis.verdict}</span>
         </div>
         <p className="mt-2 text-xs leading-relaxed text-foreground/80">{analysis.summary}</p>
       </div>
+      <div className="rounded-lg border border-border bg-card p-4">
+        <div className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-muted-foreground">
+          <Crosshair className="size-4" /> {t("val.execution")}
+        </div>
+        <dl className="mt-3 space-y-2 text-xs">
+          <ExecRow label={t("val.entry")} value={analysis.execution.entry} />
+          <ExecRow label={t("val.stop")} value={analysis.execution.stopLoss} />
+          <ExecRow label={t("val.target")} value={analysis.execution.target} />
+        </dl>
+      </div>
+    </div>
+  );
+}
+
+function ExecRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex gap-3">
+      <dt className="w-24 shrink-0 text-muted-foreground">{label}</dt>
+      <dd className="flex-1 leading-relaxed">{value}</dd>
     </div>
   );
 }
 
 function Section({ index, title, items }: { index: string; title: string; items: string[] }) {
   return (
-    <div>
-      <p className="tabular text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-        {index} · {title}
-      </p>
-      <ul className="mt-2 space-y-1.5">
-        {items.map((item) => (
-          <li key={item} className="flex gap-2 text-xs leading-relaxed">
-            <span className="text-primary">›</span>
+    <div className="rounded-lg border border-border bg-card p-4">
+      <div className="flex items-center gap-2">
+        <span className="tabular text-xs text-primary">{index}</span>
+        <h3 className="text-xs uppercase tracking-[0.18em] text-muted-foreground">{title}</h3>
+      </div>
+      <ul className="mt-3 space-y-2 text-xs leading-relaxed">
+        {items.map((item, i) => (
+          <li key={i} className="flex gap-2">
+            <span className="text-muted-foreground">·</span>
             <span>{item}</span>
           </li>
         ))}
