@@ -36,7 +36,7 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (!loading && session) navigate({ to: "/" });
+    if (!loading && session) navigate({ to: "/dashboard" });
   }, [loading, session, navigate]);
 
   async function submit(e: React.FormEvent) {
@@ -71,7 +71,7 @@ function AuthPage() {
       return;
     }
     if (result.redirected) return;
-    navigate({ to: "/" });
+    navigate({ to: "/dashboard" });
   }
 
   return (
