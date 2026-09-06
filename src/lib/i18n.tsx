@@ -175,6 +175,26 @@ const EN: Dict = {
   "status.pending": "Pending",
   "status.approved": "Approved",
   "status.rejected": "Rejected",
+
+  // landing
+  "landing.badge": "SMC / ICT Trading Terminal",
+  "landing.title": "Trade Smart Money Concepts with discipline",
+  "landing.sub": "TOKARsoft19 is a professional trading journal and analytics terminal for ICT traders: structured trade logging, setup statistics, risk rules and an AI-powered SMC chart validator.",
+  "landing.cta": "Launch Terminal",
+  "landing.ctaSignIn": "Sign In",
+  "landing.f1t": "Trade Journal",
+  "landing.f1d": "Log every position with entry, stop, target, confluence notes and TradingView links.",
+  "landing.f2t": "Setup Analytics",
+  "landing.f2d": "Win rate, realized R, equity curve and performance by asset class and timeframe.",
+  "landing.f3t": "Risk Rules",
+  "landing.f3d": "Your personal money-management checklist and a library of proven SMC setups.",
+  "landing.f4t": "SMC AI Validator",
+  "landing.f4d": "Chart screenshots and TradingView links graded against strict ICT rules.",
+
+  // validator coming soon
+  "val.soon.badge": "AI SMC Engine — In Development",
+  "val.soon.title": "Coming Soon",
+  "val.soon.body": "The AI validator that grades your charts against strict ICT rules — market structure, liquidity sweeps, premium/discount and POI — is currently in development. Live analysis is temporarily disabled.",
 };
 
 const UA: Dict = {
@@ -339,6 +359,26 @@ const UA: Dict = {
   "status.pending": "На модерації",
   "status.approved": "Схвалено",
   "status.rejected": "Відхилено",
+
+  // landing
+  "landing.badge": "SMC / ICT Торговий термінал",
+  "landing.title": "Торгуйте за Smart Money Concepts дисципліновано",
+  "landing.sub": "TOKARsoft19 — професійний торговий журнал і аналітичний термінал для ICT-трейдерів: структурований облік угод, статистика сетапів, правила ризику та AI-валідатор SMC-графіків.",
+  "landing.cta": "Запустити термінал",
+  "landing.ctaSignIn": "Увійти",
+  "landing.f1t": "Журнал угод",
+  "landing.f1d": "Фіксуйте кожну позицію: вхід, стоп, ціль, нотатки конфлюенсу та посилання TradingView.",
+  "landing.f2t": "Аналітика сетапів",
+  "landing.f2d": "Вінрейт, реалізований R, крива капіталу та ефективність за класами активів і таймфреймами.",
+  "landing.f3t": "Правила ризику",
+  "landing.f3d": "Ваш особистий чеклист мані-менеджменту та бібліотека перевірених SMC-сетапів.",
+  "landing.f4t": "SMC AI Валідатор",
+  "landing.f4d": "Скріншоти графіків і посилання TradingView, оцінені за строгими правилами ICT.",
+
+  // validator coming soon
+  "val.soon.badge": "AI SMC Engine — У розробці",
+  "val.soon.title": "Незабаром",
+  "val.soon.body": "AI-валідатор, що оцінює ваші графіки за строгими правилами ICT — структура ринку, зняття ліквідності, преміум/дисконт і POI — наразі в розробці. Живий аналіз тимчасово вимкнено.",
 };
 
 const RU: Dict = {
@@ -503,6 +543,26 @@ const RU: Dict = {
   "status.pending": "На модерации",
   "status.approved": "Одобрен",
   "status.rejected": "Отклонён",
+
+  // landing
+  "landing.badge": "SMC / ICT Торговый терминал",
+  "landing.title": "Торгуйте по Smart Money Concepts дисциплинированно",
+  "landing.sub": "TOKARsoft19 — профессиональный торговый журнал и аналитический терминал для ICT-трейдеров: структурированный учёт сделок, статистика сетапов, правила риска и AI-валидатор SMC-графиков.",
+  "landing.cta": "Запустить терминал",
+  "landing.ctaSignIn": "Войти",
+  "landing.f1t": "Журнал сделок",
+  "landing.f1d": "Фиксируйте каждую позицию: вход, стоп, цель, заметки о конфлюенсе и ссылки TradingView.",
+  "landing.f2t": "Аналитика сетапов",
+  "landing.f2d": "Винрейт, реализованный R, кривая капитала и эффективность по классам активов и таймфреймам.",
+  "landing.f3t": "Правила риска",
+  "landing.f3d": "Ваш личный чеклист мани-менеджмента и библиотека проверенных SMC-сетапов.",
+  "landing.f4t": "SMC AI Валидатор",
+  "landing.f4d": "Скриншоты графиков и ссылки TradingView, оценённые по строгим правилам ICT.",
+
+  // validator coming soon
+  "val.soon.badge": "AI SMC Engine — В разработке",
+  "val.soon.title": "Скоро",
+  "val.soon.body": "AI-валидатор, оценивающий ваши графики по строгим правилам ICT — структура рынка, снятие ликвидности, премиум/дисконт и POI — сейчас в разработке. Живой анализ временно отключён.",
 };
 
 const DICTS: Record<Lang, Dict> = { EN, UA, RU };

@@ -8,7 +8,7 @@ import { LANGS, useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
 const NAV = [
-  { to: "/", labelKey: "nav.dashboard", icon: BarChart3 },
+  { to: "/dashboard", labelKey: "nav.dashboard", icon: BarChart3 },
   { to: "/journal", labelKey: "nav.journal", icon: BookOpen },
   { to: "/validator", labelKey: "nav.validator", icon: Bot },
   { to: "/risk", labelKey: "nav.risk", icon: Shield },
@@ -130,7 +130,7 @@ export function AppShell({
         <div className="w-full max-w-sm rounded-lg border border-border bg-surface p-8 text-center">
           <h1 className="text-lg font-semibold">{t("shell.accessDenied")}</h1>
           <p className="mt-2 text-sm text-muted-foreground">{t("shell.adminOnly")}</p>
-          <Link to="/" className="mt-5 inline-block text-sm text-primary">
+          <Link to="/dashboard" className="mt-5 inline-block text-sm text-primary">
             {t("shell.backToDashboard")}
           </Link>
         </div>
@@ -173,7 +173,7 @@ export function AppShell({
               key={item.to}
               to={item.to}
               onClick={() => setOpen(false)}
-              activeOptions={{ exact: item.to === "/" }}
+              activeOptions={{ exact: true }}
               className="flex items-center gap-3 rounded-md px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
               activeProps={{
                 className:
