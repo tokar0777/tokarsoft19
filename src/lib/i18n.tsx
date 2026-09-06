@@ -175,6 +175,26 @@ const EN: Dict = {
   "status.pending": "Pending",
   "status.approved": "Approved",
   "status.rejected": "Rejected",
+
+  // landing
+  "landing.badge": "SMC / ICT Trading Terminal",
+  "landing.title": "Trade Smart Money Concepts with discipline",
+  "landing.sub": "TOKARsoft19 is a professional trading journal and analytics terminal for ICT traders: structured trade logging, setup statistics, risk rules and an AI-powered SMC chart validator.",
+  "landing.cta": "Launch Terminal",
+  "landing.ctaSignIn": "Sign In",
+  "landing.f1t": "Trade Journal",
+  "landing.f1d": "Log every position with entry, stop, target, confluence notes and TradingView links.",
+  "landing.f2t": "Setup Analytics",
+  "landing.f2d": "Win rate, realized R, equity curve and performance by asset class and timeframe.",
+  "landing.f3t": "Risk Rules",
+  "landing.f3d": "Your personal money-management checklist and a library of proven SMC setups.",
+  "landing.f4t": "SMC AI Validator",
+  "landing.f4d": "Chart screenshots and TradingView links graded against strict ICT rules.",
+
+  // validator coming soon
+  "val.soon.badge": "AI SMC Engine — In Development",
+  "val.soon.title": "Coming Soon",
+  "val.soon.body": "The AI validator that grades your charts against strict ICT rules — market structure, liquidity sweeps, premium/discount and POI — is currently in development. Live analysis is temporarily disabled.",
 };
 
 const UA: Dict = {
