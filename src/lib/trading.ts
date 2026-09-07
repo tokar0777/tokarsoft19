@@ -1,13 +1,13 @@
 export const CATEGORIES = ["Crypto", "Forex", "Metals"] as const;
 export type Category = (typeof CATEGORIES)[number];
 
-export const OUTCOMES = ["Win", "Loss", "Break-Even"] as const;
+export const OUTCOMES = ["Win", "Loss", "Break-Even", "Missed"] as const;
 export type Outcome = (typeof OUTCOMES)[number];
 
 export const DIRECTIONS = ["Long", "Short"] as const;
 export type Direction = (typeof DIRECTIONS)[number];
 
-export const TIMEFRAMES = ["Weekly", "Monthly", "Quarterly", "Yearly"] as const;
+export const TIMEFRAMES = ["Daily", "Weekly", "Monthly", "Quarterly", "Yearly", "Overall"] as const;
 export type Timeframe = (typeof TIMEFRAMES)[number];
 
 export type Trade = {
@@ -18,9 +18,6 @@ export type Trade = {
   pair: string;
   direction: string;
   setup_id: string | null;
-  entry_price: number | null;
-  stop_loss: number | null;
-  take_profit: number | null;
   realized_r: number;
   notes: string;
   chart_url: string | null;
@@ -45,14 +42,22 @@ export type RiskRule = {
 };
 
 export const TIMEFRAME_DAYS: Record<Timeframe, number> = {
+  Daily: 1,
   Weekly: 7,
   Monthly: 30,
   Quarterly: 90,
   Yearly: 365,
+  Overall: Number.POSITIVE_INFINITY,
 };
 
+/** Trades that were never entered ("Missed") are excluded from performance metrics. */
+export function isCounted(trade: Trade): boolean {
+  return trade.outcome !== "Missed";
+}
+
 export function filterTrades(trades: Trade[], category: string, timeframe: Timeframe): Trade[] {
-  const cutoff = Date.now() - TIMEFRAME_DAYS[timeframe] * 24 * 60 * 60 * 1000;
+  const days = TIMEFRAME_DAYS[timeframe];
+  const cutoff = Number.isFinite(days) ? Date.now() - days * 24 * 60 * 60 * 1000 : -Infinity;
   return trades.filter(
     (t) =>
       (category === "All" || t.category === category) && new Date(t.traded_at).getTime() >= cutoff,
