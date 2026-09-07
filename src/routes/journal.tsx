@@ -116,23 +116,25 @@ function JournalPage() {
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
-    const num = (v: string) => (v.trim() === "" ? null : Number(v));
+    const when = new Date(form.traded_at);
+    const payload = {
+      ...(form.id ? { id: form.id } : {}),
+      traded_at: (Number.isNaN(when.getTime()) ? new Date() : when).toISOString(),
+      category: form.category,
+      pair: form.pair.trim().toUpperCase(),
+      direction: form.direction,
+      setup_id: form.setup_id.trim() || null,
+      entry_price: parseOptionalNumber(form.entry_price),
+      stop_loss: parseOptionalNumber(form.stop_loss),
+      take_profit: parseOptionalNumber(form.take_profit),
+      realized_r: parseRValue(form.realized_r),
+      notes: form.notes ?? "",
+      chart_url: form.chart_url.trim() || null,
+      outcome: form.outcome,
+    };
     try {
-      await upsert.mutateAsync({
-        ...(form.id ? { id: form.id } : {}),
-        traded_at: new Date(form.traded_at).toISOString(),
-        category: form.category,
-        pair: form.pair.trim().toUpperCase(),
-        direction: form.direction,
-        setup_id: form.setup_id || null,
-        entry_price: num(form.entry_price),
-        stop_loss: num(form.stop_loss),
-        take_profit: num(form.take_profit),
-        realized_r: Number(form.realized_r || 0),
-        notes: form.notes,
-        chart_url: form.chart_url.trim() || null,
-        outcome: form.outcome,
-      });
+      await upsert.mutateAsync(payload);
+
       toast.success(form.id ? tr("journal.updated") : tr("journal.saved"));
       setOpen(false);
       setForm(emptyForm());
