@@ -139,8 +139,14 @@ function JournalPage() {
       setOpen(false);
       setForm(emptyForm());
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : tr("journal.saveError"));
+      console.error("[journal] trade save failed", { payload, error: err });
+      const detail =
+        err && typeof err === "object" && "message" in err
+          ? String((err as { message?: unknown }).message)
+          : String(err);
+      toast.error(tr("journal.saveError"), { description: detail });
     }
+
   }
 
   return (
