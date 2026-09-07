@@ -1,0 +1,10 @@
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.trades TO authenticated;
+GRANT ALL ON public.trades TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.setups TO authenticated;
+GRANT ALL ON public.setups TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.risk_rules TO authenticated;
+GRANT ALL ON public.risk_rules TO service_role;
+GRANT SELECT, UPDATE ON public.profiles TO authenticated;
+GRANT ALL ON public.profiles TO service_role;
+GRANT SELECT ON public.user_roles TO authenticated;
+GRANT ALL ON public.user_roles TO service_role;
