@@ -5,7 +5,15 @@ import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { useAuth } from "@/hooks/useAuth";
 import { useDeleteRow, useSetups, useTrades, useUpsertRow } from "@/lib/queries";
-import { CATEGORIES, DIRECTIONS, OUTCOMES, formatR, type Trade } from "@/lib/trading";
+import {
+  CATEGORIES,
+  DIRECTIONS,
+  OUTCOMES,
+  formatR,
+  parseOptionalNumber,
+  parseRValue,
+  type Trade,
+} from "@/lib/trading";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -116,29 +124,37 @@ function JournalPage() {
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
-    const num = (v: string) => (v.trim() === "" ? null : Number(v));
+    const when = new Date(form.traded_at);
+    const payload = {
+      ...(form.id ? { id: form.id } : {}),
+      traded_at: (Number.isNaN(when.getTime()) ? new Date() : when).toISOString(),
+      category: form.category,
+      pair: form.pair.trim().toUpperCase(),
+      direction: form.direction,
+      setup_id: form.setup_id.trim() || null,
+      entry_price: parseOptionalNumber(form.entry_price),
+      stop_loss: parseOptionalNumber(form.stop_loss),
+      take_profit: parseOptionalNumber(form.take_profit),
+      realized_r: parseRValue(form.realized_r),
+      notes: form.notes ?? "",
+      chart_url: form.chart_url.trim() || null,
+      outcome: form.outcome,
+    };
     try {
-      await upsert.mutateAsync({
-        ...(form.id ? { id: form.id } : {}),
-        traded_at: new Date(form.traded_at).toISOString(),
-        category: form.category,
-        pair: form.pair.trim().toUpperCase(),
-        direction: form.direction,
-        setup_id: form.setup_id || null,
-        entry_price: num(form.entry_price),
-        stop_loss: num(form.stop_loss),
-        take_profit: num(form.take_profit),
-        realized_r: Number(form.realized_r || 0),
-        notes: form.notes,
-        chart_url: form.chart_url.trim() || null,
-        outcome: form.outcome,
-      });
+      await upsert.mutateAsync(payload);
+
       toast.success(form.id ? tr("journal.updated") : tr("journal.saved"));
       setOpen(false);
       setForm(emptyForm());
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : tr("journal.saveError"));
+      console.error("[journal] trade save failed", { payload, error: err });
+      const detail =
+        err && typeof err === "object" && "message" in err
+          ? String((err as { message?: unknown }).message)
+          : String(err);
+      toast.error(tr("journal.saveError"), { description: detail });
     }
+
   }
 
   return (

@@ -53,7 +53,11 @@ export function useUpsertRow(table: "trades" | "setups" | "risk_rules", key: str
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (values: Row & { id?: string }) => {
-      const { data: auth } = await supabase.auth.getUser();
+      const { data: auth, error: authError } = await supabase.auth.getUser();
+      if (authError) {
+        console.error(`[${table}] auth check failed`, authError);
+        throw new Error(authError.message);
+      }
       const userId = auth.user?.id;
       if (!userId) throw new Error("Not signed in");
 
@@ -63,17 +67,24 @@ export function useUpsertRow(table: "trades" | "setups" | "risk_rules", key: str
           .from(table)
           .update(rest as never)
           .eq("id", id as string);
-        if (error) throw error;
+        if (error) {
+          console.error(`[${table}] update failed`, { id, payload: rest, error });
+          throw new Error(error.message || error.details || "Database update failed");
+        }
       } else {
         const { error } = await supabase
           .from(table)
           .insert({ ...values, user_id: userId } as never);
-        if (error) throw error;
+        if (error) {
+          console.error(`[${table}] insert failed`, { payload: values, userId, error });
+          throw new Error(error.message || error.details || "Database insert failed");
+        }
       }
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: [key] }),
   });
 }
+
 
 export function useDeleteRow(table: "trades" | "setups" | "risk_rules", key: string) {
   const qc = useQueryClient();
