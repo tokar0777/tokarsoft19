@@ -69,6 +69,7 @@ export type Stats = {
   wins: number;
   losses: number;
   breakEven: number;
+  missed: number;
   winRate: number;
   totalR: number;
   avgR: number;
@@ -78,7 +79,9 @@ export type Stats = {
   bestCategoryR: number;
 };
 
-export function computeStats(trades: Trade[]): Stats {
+export function computeStats(all: Trade[]): Stats {
+  const trades = all.filter(isCounted);
+  const missed = all.length - trades.length;
   const wins = trades.filter((t) => t.outcome === "Win").length;
   const losses = trades.filter((t) => t.outcome === "Loss").length;
   const breakEven = trades.filter((t) => t.outcome === "Break-Even").length;
@@ -109,8 +112,9 @@ export function computeStats(trades: Trade[]): Stats {
     wins,
     losses,
     breakEven,
+    missed,
     winRate: decided ? (wins / decided) * 100 : 0,
-    totalR,
+    totalR: Number(totalR.toFixed(2)),
     avgR: trades.length ? totalR / trades.length : 0,
     bestPair: pair.best,
     bestPairR: pair.bestR,
@@ -120,9 +124,9 @@ export function computeStats(trades: Trade[]): Stats {
 }
 
 export function equityCurve(trades: Trade[]) {
-  const sorted = [...trades].sort(
-    (a, b) => new Date(a.traded_at).getTime() - new Date(b.traded_at).getTime(),
-  );
+  const sorted = [...trades]
+    .filter(isCounted)
+    .sort((a, b) => new Date(a.traded_at).getTime() - new Date(b.traded_at).getTime());
   let cumulative = 0;
   return sorted.map((t) => {
     cumulative += Number(t.realized_r ?? 0);
@@ -136,6 +140,7 @@ export function equityCurve(trades: Trade[]) {
     };
   });
 }
+
 
 export function winLossByCategory(trades: Trade[]) {
   return CATEGORIES.map((category) => ({
