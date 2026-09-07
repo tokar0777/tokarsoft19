@@ -5,7 +5,15 @@ import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { useAuth } from "@/hooks/useAuth";
 import { useDeleteRow, useSetups, useTrades, useUpsertRow } from "@/lib/queries";
-import { CATEGORIES, DIRECTIONS, OUTCOMES, formatR, type Trade } from "@/lib/trading";
+import {
+  CATEGORIES,
+  DIRECTIONS,
+  OUTCOMES,
+  formatR,
+  parseOptionalNumber,
+  parseRValue,
+  type Trade,
+} from "@/lib/trading";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
