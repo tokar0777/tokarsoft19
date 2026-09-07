@@ -144,3 +144,34 @@ export function formatR(value: number): string {
   const rounded = Number(value.toFixed(2));
   return `${rounded > 0 ? "+" : ""}${rounded}R`;
 }
+
+/** Parse a user-typed number safely. Accepts "1,5", spaces, and returns null when empty/invalid. */
+export function parseOptionalNumber(input: string): number | null {
+  const raw = input.replace(/\s/g, "").replace(",", ".");
+  if (raw === "") return null;
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : null;
+}
+
+/**
+ * Parse a realized R:R value from free text.
+ * Accepts "2", "2.5", "-1", "1,5", "1/2", "1:2", "1R", "+3R".
+ * Ratio forms are resolved as reward / risk. Returns 0 when unparseable.
+ */
+export function parseRValue(input: string): number {
+  const raw = input.trim().replace(/\s/g, "").replace(/[rR]$/, "").replace(",", ".");
+  if (raw === "") return 0;
+
+  const ratio = raw.match(/^([+-]?\d*\.?\d+)[/:]([+-]?\d*\.?\d+)$/);
+  if (ratio) {
+    const risk = Number(ratio[1]);
+    const reward = Number(ratio[2]);
+    if (Number.isFinite(risk) && Number.isFinite(reward) && risk !== 0) {
+      return Number((reward / risk).toFixed(4));
+    }
+    return 0;
+  }
+
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : 0;
+}
