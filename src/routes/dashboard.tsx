@@ -63,6 +63,14 @@ function DashboardPage() {
   const stats = useMemo(() => computeStats(filtered), [filtered]);
   const curve = useMemo(() => equityCurve(filtered), [filtered]);
   const byCategory = useMemo(() => winLossByCategory(filtered), [filtered]);
+  const tableRows = useMemo(
+    () =>
+      TIMEFRAMES.map((tf) => {
+        const s = computeStats(filterTrades(trades, category, tf));
+        return { tf, ...s };
+      }),
+    [trades, category],
+  );
 
   return (
     <AppShell title={t("dash.title")} subtitle={t("dash.subtitle")}>
