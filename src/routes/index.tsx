@@ -12,7 +12,7 @@ export const Route = createFileRoute("/")({
         content:
           "TOKARsoft19 is a professional Smart Money Concepts trading journal: trade logging, setup analytics, risk rules and an AI SMC chart validator.",
       },
-      { property: "og:title", content: "TOKARsoft19 — SMC / ICT Trading Terminal" },
+      { property: "og:title", content: "TOKARsoft19" },
       {
         property: "og:description",
         content:
