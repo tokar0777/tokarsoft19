@@ -70,6 +70,11 @@ const EN: Dict = {
   "out.Break-Even": "Break-Even",
   "out.Missed": "Missed / No entry",
   "dash.missed": "missed",
+  "dash.table": "Performance summary (profit in %)",
+  "dash.tf": "Timeframe",
+  "dash.wl": "W / L / BE",
+  "dash.profit": "Profit %",
+  "dash.profitHint": "1R = 1% of risk capital",
 
   // journal
   "journal.title": "Trade Log",
@@ -262,6 +267,11 @@ const UA: Dict = {
   "out.Break-Even": "Беззбиток",
   "out.Missed": "Пропущено / Без ТВХ",
   "dash.missed": "пропущено",
+  "dash.table": "Зведена статистика (прибуток у %)",
+  "dash.tf": "Період",
+  "dash.wl": "W / L / BE",
+  "dash.profit": "Прибуток %",
+  "dash.profitHint": "1R = 1% ризик-капіталу",
 
   "journal.title": "Журнал угод",
   "journal.subtitle": "Кожна угода, її конфлюенції та результат",
@@ -450,6 +460,11 @@ const RU: Dict = {
   "out.Break-Even": "Безубыток",
   "out.Missed": "Пропущено / Без ТВХ",
   "dash.missed": "пропущено",
+  "dash.table": "Сводная статистика (прибыль в %)",
+  "dash.tf": "Период",
+  "dash.wl": "W / L / BE",
+  "dash.profit": "Прибыль %",
+  "dash.profitHint": "1R = 1% риск-капитала",
 
   "journal.title": "Журнал сделок",
   "journal.subtitle": "Каждая сделка, её конфлюэнции и результат",

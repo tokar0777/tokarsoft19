@@ -63,6 +63,14 @@ function DashboardPage() {
   const stats = useMemo(() => computeStats(filtered), [filtered]);
   const curve = useMemo(() => equityCurve(filtered), [filtered]);
   const byCategory = useMemo(() => winLossByCategory(filtered), [filtered]);
+  const tableRows = useMemo(
+    () =>
+      TIMEFRAMES.map((tf) => {
+        const s = computeStats(filterTrades(trades, category, tf));
+        return { tf, ...s };
+      }),
+    [trades, category],
+  );
 
   return (
     <AppShell title={t("dash.title")} subtitle={t("dash.subtitle")}>
@@ -201,6 +209,55 @@ function DashboardPage() {
           hint={stats.bestCategory ? `${formatR(stats.bestCategoryR)} ${t("dash.realized")}` : t("dash.noTradesRange")}
           tone="long"
         />
+      </div>
+
+      <div className="mt-4 rounded-lg border border-border bg-card p-5">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-sm font-semibold tracking-wide">{t("dash.table")}</h2>
+          <span className="text-xs text-muted-foreground">{t("dash.profitHint")}</span>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[560px] text-sm">
+            <thead>
+              <tr className="border-b border-border text-left text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+                <th className="py-2 pr-4 font-medium">{t("dash.tf")}</th>
+                <th className="py-2 pr-4 font-medium">{t("dash.totalTrades")}</th>
+                <th className="py-2 pr-4 font-medium">{t("dash.wl")}</th>
+                <th className="py-2 pr-4 font-medium">{t("dash.winRate")}</th>
+                <th className="py-2 pr-4 font-medium">{t("dash.totalR")}</th>
+                <th className="py-2 font-medium">{t("dash.profit")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {tableRows.map((row) => (
+                <tr key={row.tf} className="border-b border-border/50 last:border-0">
+                  <td className="py-2.5 pr-4 font-medium">{t(`tf.${row.tf}`, row.tf)}</td>
+                  <td className="tabular py-2.5 pr-4">
+                    {row.total}
+                    {row.missed > 0 && (
+                      <span className="ml-1 text-xs text-muted-foreground">+{row.missed} {t("dash.missed")}</span>
+                    )}
+                  </td>
+                  <td className="tabular py-2.5 pr-4 text-muted-foreground">
+                    {row.wins} / {row.losses} / {row.breakEven}
+                  </td>
+                  <td className="tabular py-2.5 pr-4">{row.winRate.toFixed(1)}%</td>
+                  <td className="tabular py-2.5 pr-4">{formatR(row.totalR)}</td>
+                  <td
+                    className={cn(
+                      "tabular py-2.5 font-semibold",
+                      row.totalR > 0 && "text-long",
+                      row.totalR < 0 && "text-short",
+                    )}
+                  >
+                    {row.totalR > 0 ? "+" : ""}
+                    {row.totalR.toFixed(2)}%
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </AppShell>
   );
