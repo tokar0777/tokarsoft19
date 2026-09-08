@@ -88,7 +88,7 @@ function DashboardPage() {
           icon={Activity}
           label={t("dash.totalTrades")}
           value={String(stats.total)}
-          hint={`${stats.wins}W · ${stats.losses}L · ${stats.breakEven}BE`}
+          hint={`${stats.wins}W · ${stats.losses}L · ${stats.breakEven}BE · ${stats.missed} ${t("dash.missed")}`}
         />
         <MetricCard
           icon={Percent}
