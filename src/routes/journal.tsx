@@ -10,7 +10,6 @@ import {
   DIRECTIONS,
   OUTCOMES,
   formatR,
-  parseOptionalNumber,
   parseRValue,
   type Trade,
 } from "@/lib/trading";
@@ -55,9 +54,6 @@ type FormState = {
   pair: string;
   direction: string;
   setup_id: string;
-  entry_price: string;
-  stop_loss: string;
-  take_profit: string;
   realized_r: string;
   notes: string;
   chart_url: string;
@@ -75,9 +71,6 @@ const emptyForm = (): FormState => ({
   pair: "",
   direction: "Long",
   setup_id: "",
-  entry_price: "",
-  stop_loss: "",
-  take_profit: "",
   realized_r: "",
   notes: "",
   chart_url: "",
@@ -111,9 +104,6 @@ function JournalPage() {
       pair: trade.pair,
       direction: trade.direction,
       setup_id: trade.setup_id ?? "",
-      entry_price: trade.entry_price?.toString() ?? "",
-      stop_loss: trade.stop_loss?.toString() ?? "",
-      take_profit: trade.take_profit?.toString() ?? "",
       realized_r: String(trade.realized_r ?? 0),
       notes: trade.notes ?? "",
       chart_url: trade.chart_url ?? "",
@@ -132,9 +122,6 @@ function JournalPage() {
       pair: form.pair.trim().toUpperCase(),
       direction: form.direction,
       setup_id: form.setup_id.trim() || null,
-      entry_price: parseOptionalNumber(form.entry_price),
-      stop_loss: parseOptionalNumber(form.stop_loss),
-      take_profit: parseOptionalNumber(form.take_profit),
       realized_r: parseRValue(form.realized_r),
       notes: form.notes ?? "",
       chart_url: form.chart_url.trim() || null,
@@ -195,7 +182,6 @@ function JournalPage() {
               <th className="px-4 py-3 font-medium">{tr("journal.col.class")}</th>
               <th className="px-4 py-3 font-medium">{tr("journal.col.side")}</th>
               <th className="px-4 py-3 font-medium">{tr("journal.col.setup")}</th>
-              <th className="px-4 py-3 font-medium">{tr("journal.col.prices")}</th>
               <th className="px-4 py-3 font-medium">R</th>
               <th className="px-4 py-3 font-medium">{tr("journal.col.outcome")}</th>
               <th className="px-4 py-3 font-medium">{tr("journal.col.chart")}</th>
@@ -236,11 +222,6 @@ function JournalPage() {
                     <span className="text-muted-foreground">—</span>
                   )}
                 </td>
-                <td className="tabular px-4 py-3 text-xs text-muted-foreground">
-                  {[t.entry_price, t.stop_loss, t.take_profit]
-                    .map((v) => (v === null || v === undefined ? "—" : v))
-                    .join(" / ")}
-                </td>
                 <td
                   className={cn(
                     "tabular px-4 py-3 font-semibold",
@@ -257,6 +238,7 @@ function JournalPage() {
                       t.outcome === "Win" && "bg-long/15 text-long",
                       t.outcome === "Loss" && "bg-short/15 text-short",
                       t.outcome === "Break-Even" && "bg-muted text-muted-foreground",
+                      t.outcome === "Missed" && "bg-primary/15 text-primary",
                     )}
                   >
                     {tr(`out.${t.outcome}`, t.outcome)}
@@ -297,7 +279,7 @@ function JournalPage() {
             ))}
             {visible.length === 0 && (
               <tr>
-                <td colSpan={10} className="px-4 py-12 text-center text-sm text-muted-foreground">
+                <td colSpan={9} className="px-4 py-12 text-center text-sm text-muted-foreground">
                   {isLoading ? tr("journal.loading") : tr("journal.empty")}
                 </td>
               </tr>
@@ -363,30 +345,12 @@ function JournalPage() {
                   labels={Object.fromEntries(OUTCOMES.map((o) => [o, tr(`out.${o}`, o)]))}
                 />
               </Field>
-              <Field label={tr("journal.field.entry")}>
-                <Input
-                  inputMode="decimal"
-                  value={form.entry_price}
-                  onChange={(e) => setForm({ ...form, entry_price: e.target.value })}
-                />
-              </Field>
-              <Field label={tr("journal.field.sl")}>
-                <Input
-                  inputMode="decimal"
-                  value={form.stop_loss}
-                  onChange={(e) => setForm({ ...form, stop_loss: e.target.value })}
-                />
-              </Field>
-              <Field label={tr("journal.field.tp")}>
-                <Input
-                  inputMode="decimal"
-                  value={form.take_profit}
-                  onChange={(e) => setForm({ ...form, take_profit: e.target.value })}
-                />
-              </Field>
               <Field label={tr("journal.field.r")}>
                 <Input
-                  inputMode="decimal"
+                  type="text"
+                  inputMode="text"
+                  placeholder="-1, +3.5, 1/2, 2/4"
+                  autoComplete="off"
                   value={form.realized_r}
                   onChange={(e) => setForm({ ...form, realized_r: e.target.value })}
                 />
