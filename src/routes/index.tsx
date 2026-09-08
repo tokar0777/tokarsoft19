@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "TOKARsoft19 — SMC / ICT Trading Journal & Analytics Terminal" },
+      { title: "TOKARsoft19" },
       {
         name: "description",
         content:
