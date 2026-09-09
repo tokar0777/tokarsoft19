@@ -14,6 +14,8 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as JournalRouteImport } from './routes/journal'
+import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RiskRouteImport } from './routes/risk'
 import { Route as ValidatorRouteImport } from './routes/validator'
 
@@ -42,6 +44,16 @@ const JournalRoute = JournalRouteImport.update({
   path: '/journal',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RiskRoute = RiskRouteImport.update({
   id: '/risk',
   path: '/risk',
@@ -59,6 +71,8 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
   '/journal': typeof JournalRoute
+  '/profile': typeof ProfileRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/risk': typeof RiskRoute
   '/validator': typeof ValidatorRoute
 }
@@ -68,6 +82,8 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
   '/journal': typeof JournalRoute
+  '/profile': typeof ProfileRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/risk': typeof RiskRoute
   '/validator': typeof ValidatorRoute
 }
@@ -78,6 +94,8 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
   '/journal': typeof JournalRoute
+  '/profile': typeof ProfileRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/risk': typeof RiskRoute
   '/validator': typeof ValidatorRoute
 }
@@ -89,6 +107,8 @@ export interface FileRouteTypes {
     | '/auth'
     | '/dashboard'
     | '/journal'
+    | '/profile'
+    | '/reset-password'
     | '/risk'
     | '/validator'
   fileRoutesByTo: FileRoutesByTo
@@ -98,6 +118,8 @@ export interface FileRouteTypes {
     | '/auth'
     | '/dashboard'
     | '/journal'
+    | '/profile'
+    | '/reset-password'
     | '/risk'
     | '/validator'
   id:
@@ -107,6 +129,8 @@ export interface FileRouteTypes {
     | '/auth'
     | '/dashboard'
     | '/journal'
+    | '/profile'
+    | '/reset-password'
     | '/risk'
     | '/validator'
   fileRoutesById: FileRoutesById
@@ -117,6 +141,8 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   DashboardRoute: typeof DashboardRoute
   JournalRoute: typeof JournalRoute
+  ProfileRoute: typeof ProfileRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   RiskRoute: typeof RiskRoute
   ValidatorRoute: typeof ValidatorRoute
 }
@@ -158,6 +184,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JournalRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/risk': {
       id: '/risk'
       path: '/risk'
@@ -181,6 +221,8 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   DashboardRoute: DashboardRoute,
   JournalRoute: JournalRoute,
+  ProfileRoute: ProfileRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   RiskRoute: RiskRoute,
   ValidatorRoute: ValidatorRoute,
 }

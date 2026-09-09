@@ -223,6 +223,15 @@ export function AppShell({
             {subtitle && <p className="truncate text-xs text-muted-foreground">{subtitle}</p>}
           </div>
           <div className="ml-auto flex items-center gap-2">
+            <Link
+              to="/profile"
+              aria-label={t("shell.profile")}
+              title={t("shell.profile")}
+              className="flex size-8 items-center justify-center rounded-full border border-border bg-primary/10 text-xs font-semibold uppercase text-primary transition-colors hover:border-primary"
+              activeProps={{ className: "border-primary" }}
+            >
+              {(user?.email ?? "?").slice(0, 1)}
+            </Link>
             <div className="hidden items-center gap-1 sm:flex">
               {SOCIALS.map((s) => (
                 <a
