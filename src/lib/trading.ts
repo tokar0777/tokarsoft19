@@ -155,6 +155,52 @@ export function formatR(value: number): string {
   return `${rounded > 0 ? "+" : ""}${rounded}R`;
 }
 
+export type DailyPnL = {
+  date: string;
+  day: number;
+  totalR: number;
+  trades: number;
+  wins: number;
+  losses: number;
+};
+
+/** Group counted trades into daily P&L buckets for a given calendar month. */
+export function dailyPnLByMonth(trades: Trade[], year: number, month: number): DailyPnL[] {
+  const filtered = trades.filter(isCounted);
+  const map = new Map<string, DailyPnL>();
+
+  for (const t of filtered) {
+    const d = new Date(t.traded_at);
+    if (d.getFullYear() !== year || d.getMonth() !== month) continue;
+    const key = `${year}-${String(month + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    const r = Number(t.realized_r ?? 0);
+    const existing = map.get(key);
+    if (existing) {
+      existing.totalR += r;
+      existing.trades += 1;
+      if (t.outcome === "Win") existing.wins += 1;
+      if (t.outcome === "Loss") existing.losses += 1;
+    } else {
+      map.set(key, {
+        date: key,
+        day: d.getDate(),
+        totalR: r,
+        trades: 1,
+        wins: t.outcome === "Win" ? 1 : 0,
+        losses: t.outcome === "Loss" ? 1 : 0,
+      });
+    }
+  }
+
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const result: DailyPnL[] = [];
+  for (let day = 1; day <= daysInMonth; day++) {
+    const key = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    result.push(map.get(key) ?? { date: key, day, totalR: 0, trades: 0, wins: 0, losses: 0 });
+  }
+  return result;
+}
+
 /** Parse a user-typed number safely. Accepts "1,5", spaces, and returns null when empty/invalid. */
 export function parseOptionalNumber(input: string): number | null {
   const raw = input.replace(/\s/g, "").replace(",", ".");
