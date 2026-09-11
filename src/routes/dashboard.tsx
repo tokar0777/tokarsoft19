@@ -260,6 +260,10 @@ function DashboardPage() {
           </table>
         </div>
       </div>
+
+      <div className="mt-4 rounded-lg border border-border bg-card p-5">
+        <PnLCalendar trades={trades} />
+      </div>
     </AppShell>
   );
 }
