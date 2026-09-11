@@ -95,6 +95,10 @@ const EN: Dict = {
   "dash.wl": "W / L / BE",
   "dash.profit": "Profit %",
   "dash.profitHint": "1R = 1% of risk capital",
+  "dash.dailyPnL": "Daily P&L %",
+  "dash.dailyPnLHint": "Profit or loss per trading day",
+  "dash.monthTotal": "Month total",
+  "dash.tradesCount": "trades",
 
   // journal
   "journal.title": "Trade Log",
