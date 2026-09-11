@@ -1,6 +1,54 @@
 export const CATEGORIES = ["Crypto", "Forex", "Metals"] as const;
 export type Category = (typeof CATEGORIES)[number];
 
+/** Default trading pairs grouped by asset class. Users can add more (stored locally). */
+export const DEFAULT_PAIRS: Record<Category, string[]> = {
+  Forex: ["EURUSD", "GBPUSD", "USDJPY", "AUDUSD", "USDCAD"],
+  Metals: ["XAUUSD", "XAGUSD"],
+  Crypto: ["BTCUSDT", "ETHUSDT", "SOLUSDT"],
+};
+
+const CUSTOM_PAIRS_KEY = "tokarsoft19-custom-pairs";
+
+export function loadCustomPairs(): Record<Category, string[]> {
+  const empty: Record<Category, string[]> = { Crypto: [], Forex: [], Metals: [] };
+  if (typeof window === "undefined") return empty;
+  try {
+    const raw = window.localStorage.getItem(CUSTOM_PAIRS_KEY);
+    if (!raw) return empty;
+    const parsed = JSON.parse(raw) as Partial<Record<Category, string[]>>;
+    for (const c of CATEGORIES) {
+      if (Array.isArray(parsed[c])) empty[c] = parsed[c]!.map(String);
+    }
+  } catch {
+    /* ignore malformed storage */
+  }
+  return empty;
+}
+
+export function saveCustomPairs(pairs: Record<Category, string[]>) {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(CUSTOM_PAIRS_KEY, JSON.stringify(pairs));
+}
+
+export function normalizePair(input: string): string {
+  return input.trim().toUpperCase().replace(/\s+/g, "");
+}
+
+/** Guess the asset class for a pair symbol. */
+export function categoryForPair(
+  pair: string,
+  custom?: Record<Category, string[]>,
+): Category | null {
+  const p = normalizePair(pair);
+  for (const c of CATEGORIES) {
+    if (DEFAULT_PAIRS[c].includes(p) || custom?.[c]?.includes(p)) return c;
+  }
+  if (/^X(AU|AG|PT|PD)/.test(p)) return "Metals";
+  if (/(USDT|USDC|BTC|ETH)$/.test(p)) return "Crypto";
+  return null;
+}
+
 export const OUTCOMES = ["Win", "Loss", "Break-Even", "Missed"] as const;
 export type Outcome = (typeof OUTCOMES)[number];
 

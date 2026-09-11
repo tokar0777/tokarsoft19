@@ -313,12 +313,63 @@ function JournalPage() {
                 />
               </Field>
               <Field label={tr("journal.field.pair")}>
-                <Input
-                  required
-                  placeholder="EUR/USD, XAU/USD, BTC/USDT"
-                  value={form.pair}
-                  onChange={(e) => setForm({ ...form, pair: e.target.value })}
-                />
+                <div className="space-y-2">
+                  <select
+                    required
+                    value={form.pair}
+                    onChange={(e) => {
+                      const v = e.target.value;
+                      if (v === "__new__") {
+                        setAddingPair(true);
+                        return;
+                      }
+                      const cat = categoryForPair(v, customPairs);
+                      setForm({ ...form, pair: v, category: cat ?? form.category });
+                    }}
+                    className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    <option value="">{tr("journal.pickPair")}</option>
+                    {CATEGORIES.map((c) => (
+                      <optgroup key={c} label={tr(`cat.${c}`, c)}>
+                        {[...DEFAULT_PAIRS[c], ...(customPairs[c] ?? [])].map((p) => (
+                          <option key={p} value={p}>
+                            {p}
+                          </option>
+                        ))}
+                      </optgroup>
+                    ))}
+                    <option value="__new__">{tr("journal.addPair")}</option>
+                  </select>
+                  {addingPair && (
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="XAGUSD"
+                        value={newPair}
+                        onChange={(e) => setNewPair(e.target.value)}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => {
+                          const p = normalizePair(newPair);
+                          if (!p) return;
+                          const cat = categoryForPair(p, customPairs) ?? (form.category as Category);
+                          const next = {
+                            ...customPairs,
+                            [cat]: Array.from(new Set([...(customPairs[cat] ?? []), p])),
+                          };
+                          setCustomPairs(next);
+                          saveCustomPairs(next);
+                          setForm({ ...form, pair: p, category: cat });
+                          setNewPair("");
+                          setAddingPair(false);
+                        }}
+                      >
+                        {tr("journal.save")}
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </Field>
               <Field label={tr("journal.field.direction")}>
                 <NativeSelect
