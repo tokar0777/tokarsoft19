@@ -95,6 +95,10 @@ const EN: Dict = {
   "dash.wl": "W / L / BE",
   "dash.profit": "Profit %",
   "dash.profitHint": "1R = 1% of risk capital",
+  "dash.dailyPnL": "Daily P&L %",
+  "dash.dailyPnLHint": "Profit or loss per trading day",
+  "dash.monthTotal": "Month total",
+  "dash.tradesCount": "trades",
 
   // journal
   "journal.title": "Trade Log",
@@ -312,6 +316,10 @@ const UA: Dict = {
   "dash.wl": "W / L / BE",
   "dash.profit": "Прибуток %",
   "dash.profitHint": "1R = 1% ризик-капіталу",
+  "dash.dailyPnL": "Денний P&L %",
+  "dash.dailyPnLHint": "Прибуток або збиток за торговий день",
+  "dash.monthTotal": "Всього за місяць",
+  "dash.tradesCount": "угод",
 
   "journal.title": "Журнал угод",
   "journal.subtitle": "Кожна угода, її конфлюенції та результат",
@@ -525,6 +533,10 @@ const RU: Dict = {
   "dash.wl": "W / L / BE",
   "dash.profit": "Прибыль %",
   "dash.profitHint": "1R = 1% риск-капитала",
+  "dash.dailyPnL": "Дневной P&L %",
+  "dash.dailyPnLHint": "Прибыль или убыток за торговый день",
+  "dash.monthTotal": "Итого за месяц",
+  "dash.tradesCount": "сделок",
 
   "journal.title": "Журнал сделок",
   "journal.subtitle": "Каждая сделка, её конфлюэнции и результат",

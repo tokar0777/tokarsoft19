@@ -11,7 +11,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { Activity, Percent, Sigma, Target, Trophy } from "lucide-react";
+import { Activity, ChevronLeft, ChevronRight, Percent, Sigma, Target, Trophy } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { useAuth } from "@/hooks/useAuth";
 import { useTrades } from "@/lib/queries";
@@ -19,11 +19,13 @@ import {
   CATEGORIES,
   TIMEFRAMES,
   computeStats,
+  dailyPnLByMonth,
   equityCurve,
   filterTrades,
   formatR,
   winLossByCategory,
   type Timeframe,
+  type Trade,
 } from "@/lib/trading";
 import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
@@ -259,7 +261,117 @@ function DashboardPage() {
           </table>
         </div>
       </div>
+
+      <div className="mt-4 rounded-lg border border-border bg-card p-5">
+        <PnLCalendar trades={trades} />
+      </div>
     </AppShell>
+  );
+}
+
+const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+function PnLCalendar({ trades }: { trades: Trade[] }) {
+  const { t, lang } = useI18n();
+  const [cursor, setCursor] = useState(() => new Date());
+  const year = cursor.getFullYear();
+  const month = cursor.getMonth();
+
+  const days = useMemo(() => dailyPnLByMonth(trades, year, month), [trades, year, month]);
+  const monthTotal = useMemo(() => days.reduce((sum, d) => sum + d.totalR, 0), [days]);
+  const monthTrades = useMemo(() => days.reduce((sum, d) => sum + d.trades, 0), [days]);
+
+  const firstDayOfMonth = new Date(year, month, 1).getDay();
+  const leadOffset = firstDayOfMonth === 0 ? 6 : firstDayOfMonth - 1;
+
+  const monthLabel = cursor.toLocaleDateString(
+    lang === "UA" ? "uk-UA" : lang === "RU" ? "ru-RU" : "en-US",
+    { year: "numeric", month: "long" },
+  );
+
+  const prevMonth = () => setCursor(new Date(year, month - 1, 1));
+  const nextMonth = () => setCursor(new Date(year, month + 1, 1));
+
+  return (
+    <div>
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="text-sm font-semibold tracking-wide">{t("dash.dailyPnL")}</h2>
+          <p className="text-xs text-muted-foreground">{t("dash.dailyPnLHint")}</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={prevMonth}
+            className="flex size-8 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <ChevronLeft className="size-4" />
+          </button>
+          <span className="min-w-[120px] text-center text-sm font-medium">{monthLabel}</span>
+          <button
+            onClick={nextMonth}
+            className="flex size-8 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <ChevronRight className="size-4" />
+          </button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-7 gap-1">
+        {WEEKDAYS.map((d) => (
+          <div
+            key={d}
+            className="py-2 text-center text-[10px] uppercase tracking-wider text-muted-foreground"
+          >
+            {d}
+          </div>
+        ))}
+        {Array.from({ length: leadOffset }).map((_, i) => (
+          <div key={`lead-${i}`} className="aspect-square rounded-md bg-muted/30" />
+        ))}
+        {days.map((day) => (
+          <div
+            key={day.date}
+            className={cn(
+              "flex aspect-square flex-col items-center justify-center rounded-md border text-xs transition-colors",
+              day.trades === 0
+                ? "border-border/50 bg-card"
+                : day.totalR > 0
+                  ? "border-long/30 bg-long/10 text-long"
+                  : day.totalR < 0
+                    ? "border-short/30 bg-short/10 text-short"
+                    : "border-border/50 bg-muted/30 text-muted-foreground",
+            )}
+          >
+            <span className="font-medium">{day.day}</span>
+            {day.trades > 0 && (
+              <span className="tabular mt-0.5 text-[10px]">
+                {day.totalR > 0 ? "+" : ""}
+                {day.totalR.toFixed(2)}%
+              </span>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-4 flex flex-wrap items-center gap-4 border-t border-border pt-3 text-xs text-muted-foreground">
+        <span>
+          {t("dash.monthTotal")}:{" "}
+          <span
+            className={cn(
+              "font-semibold",
+              monthTotal > 0 && "text-long",
+              monthTotal < 0 && "text-short",
+            )}
+          >
+            {monthTotal > 0 ? "+" : ""}
+            {monthTotal.toFixed(2)}%
+          </span>
+        </span>
+        <span>
+          {monthTrades} {t("dash.tradesCount")}
+        </span>
+      </div>
+    </div>
   );
 }
 
