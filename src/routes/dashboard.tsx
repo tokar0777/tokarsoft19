@@ -11,7 +11,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { Activity, Percent, Sigma, Target, Trophy } from "lucide-react";
+import { Activity, ChevronLeft, ChevronRight, Percent, Sigma, Target, Trophy } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { useAuth } from "@/hooks/useAuth";
 import { useTrades } from "@/lib/queries";
@@ -19,6 +19,7 @@ import {
   CATEGORIES,
   TIMEFRAMES,
   computeStats,
+  dailyPnLByMonth,
   equityCurve,
   filterTrades,
   formatR,
