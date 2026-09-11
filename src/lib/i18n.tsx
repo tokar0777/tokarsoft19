@@ -316,6 +316,10 @@ const UA: Dict = {
   "dash.wl": "W / L / BE",
   "dash.profit": "Прибуток %",
   "dash.profitHint": "1R = 1% ризик-капіталу",
+  "dash.dailyPnL": "Денний P&L %",
+  "dash.dailyPnLHint": "Прибуток або збиток за торговий день",
+  "dash.monthTotal": "Всього за місяць",
+  "dash.tradesCount": "угод",
 
   "journal.title": "Журнал угод",
   "journal.subtitle": "Кожна угода, її конфлюенції та результат",
