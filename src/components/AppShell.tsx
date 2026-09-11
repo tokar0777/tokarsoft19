@@ -187,7 +187,7 @@ export function AppShell({
         </nav>
 
         <div className="border-t border-sidebar-border p-3">
-          <div className="flex items-center gap-2 pb-3">
+          <div className="grid grid-cols-3 gap-2 pb-3">
             {SOCIALS.map((s) => (
               <a
                 key={s.labelKey}
@@ -196,9 +196,11 @@ export function AppShell({
                 rel="noreferrer noopener"
                 aria-label={t(s.labelKey)}
                 title={t(s.labelKey)}
-                className="flex items-center gap-2 rounded-md border border-sidebar-border px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-primary"
+                className="flex items-center justify-center gap-1.5 rounded-md border border-sidebar-border px-2 py-1.5 text-xs leading-none text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-primary"
               >
-                <s.icon className="size-3.5" />
+                <span className="flex size-3.5 items-center justify-center">
+                  <s.icon className="size-3.5" />
+                </span>
                 {t(s.labelKey)}
               </a>
             ))}
