@@ -533,6 +533,10 @@ const RU: Dict = {
   "dash.wl": "W / L / BE",
   "dash.profit": "Прибыль %",
   "dash.profitHint": "1R = 1% риск-капитала",
+  "dash.dailyPnL": "Дневной P&L %",
+  "dash.dailyPnLHint": "Прибыль или убыток за торговый день",
+  "dash.monthTotal": "Итого за месяц",
+  "dash.tradesCount": "сделок",
 
   "journal.title": "Журнал сделок",
   "journal.subtitle": "Каждая сделка, её конфлюэнции и результат",
