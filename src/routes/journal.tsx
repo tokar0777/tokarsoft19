@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ExternalLink, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
@@ -7,10 +7,16 @@ import { useAuth } from "@/hooks/useAuth";
 import { useDeleteRow, useSetups, useTrades, useUpsertRow } from "@/lib/queries";
 import {
   CATEGORIES,
+  DEFAULT_PAIRS,
   DIRECTIONS,
   OUTCOMES,
+  categoryForPair,
   formatR,
+  loadCustomPairs,
+  normalizePair,
   parseRValue,
+  saveCustomPairs,
+  type Category,
   type Trade,
 } from "@/lib/trading";
 import { Button } from "@/components/ui/button";
@@ -88,6 +94,17 @@ function JournalPage() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<FormState>(emptyForm());
   const [outcomeFilter, setOutcomeFilter] = useState("All");
+  const [customPairs, setCustomPairs] = useState<Record<Category, string[]>>({
+    Crypto: [],
+    Forex: [],
+    Metals: [],
+  });
+  const [addingPair, setAddingPair] = useState(false);
+  const [newPair, setNewPair] = useState("");
+
+  useEffect(() => {
+    setCustomPairs(loadCustomPairs());
+  }, []);
 
   const setupName = useMemo(
     () => new Map(setups.map((s) => [s.id, s.name])),
@@ -338,6 +355,10 @@ function JournalPage() {
                         ))}
                       </optgroup>
                     ))}
+                    {form.pair &&
+                      !CATEGORIES.some((c) =>
+                        [...DEFAULT_PAIRS[c], ...(customPairs[c] ?? [])].includes(form.pair),
+                      ) && <option value={form.pair}>{form.pair}</option>}
                     <option value="__new__">{tr("journal.addPair")}</option>
                   </select>
                   {addingPair && (
