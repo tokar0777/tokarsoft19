@@ -60,11 +60,11 @@ type FormState = {
   pair: string;
   direction: string;
   setup_id: string;
-  realized_r: string;
-  notes: string;
-  chart_url: string;
-  outcome: string;
+  rr: string;
+  custom_r: string;
 };
+
+const RR_OPTIONS = ["1/1", "1/1.5", "1/2", "1/2.5", "1/3", "1/4", "1/5"] as const;
 
 function localInput(date: Date) {
   const off = date.getTimezoneOffset();
@@ -77,11 +77,18 @@ const emptyForm = (): FormState => ({
   pair: "",
   direction: "Long",
   setup_id: "",
-  realized_r: "",
-  notes: "",
-  chart_url: "",
-  outcome: "Win",
+  rr: "1/2",
+  custom_r: "",
 });
+
+function rrChoiceFor(trade: Trade): { rr: string; custom_r: string } {
+  if (trade.outcome === "Missed") return { rr: "missed", custom_r: "" };
+  const r = Number(trade.realized_r ?? 0);
+  if (r < 0) return { rr: "-1", custom_r: "" };
+  const preset = RR_OPTIONS.find((o) => Math.abs(parseRValue(o) - r) < 1e-9);
+  if (preset) return { rr: preset, custom_r: "" };
+  return { rr: "custom", custom_r: String(r) };
+}
 
 function JournalPage() {
   const { session } = useAuth();
