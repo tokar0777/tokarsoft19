@@ -268,20 +268,6 @@ function JournalPage() {
                   </span>
                 </td>
                 <td className="px-4 py-3">
-                  {t.chart_url ? (
-                    <a
-                      href={t.chart_url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
-                    >
-                      {tr("journal.view")} <ExternalLink className="size-3" />
-                    </a>
-                  ) : (
-                    <span className="text-xs text-muted-foreground">—</span>
-                  )}
-                </td>
-                <td className="px-4 py-3">
                   <div className="flex justify-end gap-1">
                     <Button size="icon" variant="ghost" onClick={() => edit(t)}>
                       <Pencil className="size-4" />
@@ -302,7 +288,7 @@ function JournalPage() {
             ))}
             {visible.length === 0 && (
               <tr>
-                <td colSpan={9} className="px-4 py-12 text-center text-sm text-muted-foreground">
+                <td colSpan={8} className="px-4 py-12 text-center text-sm text-muted-foreground">
                   {isLoading ? tr("journal.loading") : tr("journal.empty")}
                 </td>
               </tr>
