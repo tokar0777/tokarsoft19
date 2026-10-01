@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { ExternalLink, Pencil, Plus, Trash2 } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { useAuth } from "@/hooks/useAuth";
@@ -22,7 +22,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
   DialogContent,
@@ -60,11 +59,11 @@ type FormState = {
   pair: string;
   direction: string;
   setup_id: string;
-  realized_r: string;
-  notes: string;
-  chart_url: string;
-  outcome: string;
+  rr: string;
+  custom_r: string;
 };
+
+const RR_OPTIONS = ["1/1", "1/1.5", "1/2", "1/2.5", "1/3", "1/4", "1/5"] as const;
 
 function localInput(date: Date) {
   const off = date.getTimezoneOffset();
@@ -77,11 +76,18 @@ const emptyForm = (): FormState => ({
   pair: "",
   direction: "Long",
   setup_id: "",
-  realized_r: "",
-  notes: "",
-  chart_url: "",
-  outcome: "Win",
+  rr: "1/2",
+  custom_r: "",
 });
+
+function rrChoiceFor(trade: Trade): { rr: string; custom_r: string } {
+  if (trade.outcome === "Missed") return { rr: "missed", custom_r: "" };
+  const r = Number(trade.realized_r ?? 0);
+  if (r < 0) return { rr: "-1", custom_r: "" };
+  const preset = RR_OPTIONS.find((o) => Math.abs(parseRValue(o) - r) < 1e-9);
+  if (preset) return { rr: preset, custom_r: "" };
+  return { rr: "custom", custom_r: String(r) };
+}
 
 function JournalPage() {
   const { session } = useAuth();
@@ -121,10 +127,7 @@ function JournalPage() {
       pair: trade.pair,
       direction: trade.direction,
       setup_id: trade.setup_id ?? "",
-      realized_r: String(trade.realized_r ?? 0),
-      notes: trade.notes ?? "",
-      chart_url: trade.chart_url ?? "",
-      outcome: trade.outcome,
+      ...rrChoiceFor(trade),
     });
     setOpen(true);
   }
@@ -132,6 +135,10 @@ function JournalPage() {
   async function save(e: React.FormEvent) {
     e.preventDefault();
     const when = new Date(form.traded_at);
+    const missed = form.rr === "missed";
+    const loss = form.rr === "-1";
+    const realized_r = missed ? 0 : loss ? -1 : parseRValue(form.rr === "custom" ? form.custom_r : form.rr);
+    const outcome = missed ? "Missed" : loss ? "Loss" : realized_r === 0 ? "Break-Even" : "Win";
     const payload = {
       ...(form.id ? { id: form.id } : {}),
       traded_at: (Number.isNaN(when.getTime()) ? new Date() : when).toISOString(),
@@ -139,10 +146,10 @@ function JournalPage() {
       pair: form.pair.trim().toUpperCase(),
       direction: form.direction,
       setup_id: form.setup_id.trim() || null,
-      realized_r: parseRValue(form.realized_r),
-      notes: form.notes ?? "",
-      chart_url: form.chart_url.trim() || null,
-      outcome: form.outcome,
+      realized_r,
+      notes: "",
+      chart_url: null,
+      outcome,
     };
     try {
       await upsert.mutateAsync(payload);
@@ -201,7 +208,6 @@ function JournalPage() {
               <th className="px-4 py-3 font-medium">{tr("journal.col.setup")}</th>
               <th className="px-4 py-3 font-medium">R</th>
               <th className="px-4 py-3 font-medium">{tr("journal.col.outcome")}</th>
-              <th className="px-4 py-3 font-medium">{tr("journal.col.chart")}</th>
               <th className="px-4 py-3 text-right font-medium">{tr("journal.col.actions")}</th>
             </tr>
           </thead>
@@ -262,20 +268,6 @@ function JournalPage() {
                   </span>
                 </td>
                 <td className="px-4 py-3">
-                  {t.chart_url ? (
-                    <a
-                      href={t.chart_url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
-                    >
-                      {tr("journal.view")} <ExternalLink className="size-3" />
-                    </a>
-                  ) : (
-                    <span className="text-xs text-muted-foreground">—</span>
-                  )}
-                </td>
-                <td className="px-4 py-3">
                   <div className="flex justify-end gap-1">
                     <Button size="icon" variant="ghost" onClick={() => edit(t)}>
                       <Pencil className="size-4" />
@@ -296,7 +288,7 @@ function JournalPage() {
             ))}
             {visible.length === 0 && (
               <tr>
-                <td colSpan={9} className="px-4 py-12 text-center text-sm text-muted-foreground">
+                <td colSpan={8} className="px-4 py-12 text-center text-sm text-muted-foreground">
                   {isLoading ? tr("journal.loading") : tr("journal.empty")}
                 </td>
               </tr>
@@ -409,41 +401,36 @@ function JournalPage() {
                   placeholder={tr("journal.noSetup")}
                 />
               </Field>
-              <Field label={tr("journal.field.outcome")}>
-                <NativeSelect
-                  value={form.outcome}
-                  onChange={(v) => setForm({ ...form, outcome: v })}
-                  options={[...OUTCOMES]}
-                  labels={Object.fromEntries(OUTCOMES.map((o) => [o, tr(`out.${o}`, o)]))}
-                />
-              </Field>
               <Field label={tr("journal.field.r")}>
-                <Input
-                  type="text"
-                  inputMode="text"
-                  placeholder="-1, +3.5, 1/2, 2/4"
-                  autoComplete="off"
-                  value={form.realized_r}
-                  onChange={(e) => setForm({ ...form, realized_r: e.target.value })}
-                />
+                <div className="space-y-2">
+                  <select
+                    required
+                    value={form.rr}
+                    onChange={(e) => setForm({ ...form, rr: e.target.value })}
+                    className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    {RR_OPTIONS.map((o) => (
+                      <option key={o} value={o}>
+                        +{parseRValue(o)}R ({o})
+                      </option>
+                    ))}
+                    <option value="-1">-1R ({tr("out.Loss", "Loss")})</option>
+                    <option value="missed">{tr("out.Missed", "Missed")}</option>
+                    <option value="custom">{tr("journal.customR")}</option>
+                  </select>
+                  {form.rr === "custom" && (
+                    <Input
+                      type="text"
+                      inputMode="decimal"
+                      placeholder="1/6, 3.5, 7R"
+                      autoComplete="off"
+                      value={form.custom_r}
+                      onChange={(e) => setForm({ ...form, custom_r: e.target.value })}
+                    />
+                  )}
+                </div>
               </Field>
             </div>
-            <Field label={tr("journal.field.url")}>
-              <Input
-                type="url"
-                placeholder="https://www.tradingview.com/chart/…"
-                value={form.chart_url}
-                onChange={(e) => setForm({ ...form, chart_url: e.target.value })}
-              />
-            </Field>
-            <Field label={tr("journal.field.notes")}>
-              <Textarea
-                rows={4}
-                placeholder={tr("journal.notesPlaceholder")}
-                value={form.notes}
-                onChange={(e) => setForm({ ...form, notes: e.target.value })}
-              />
-            </Field>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>
                 {tr("journal.cancel")}
