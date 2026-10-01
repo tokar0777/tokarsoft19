@@ -417,41 +417,36 @@ function JournalPage() {
                   placeholder={tr("journal.noSetup")}
                 />
               </Field>
-              <Field label={tr("journal.field.outcome")}>
-                <NativeSelect
-                  value={form.outcome}
-                  onChange={(v) => setForm({ ...form, outcome: v })}
-                  options={[...OUTCOMES]}
-                  labels={Object.fromEntries(OUTCOMES.map((o) => [o, tr(`out.${o}`, o)]))}
-                />
-              </Field>
               <Field label={tr("journal.field.r")}>
-                <Input
-                  type="text"
-                  inputMode="text"
-                  placeholder="-1, +3.5, 1/2, 2/4"
-                  autoComplete="off"
-                  value={form.realized_r}
-                  onChange={(e) => setForm({ ...form, realized_r: e.target.value })}
-                />
+                <div className="space-y-2">
+                  <select
+                    required
+                    value={form.rr}
+                    onChange={(e) => setForm({ ...form, rr: e.target.value })}
+                    className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    {RR_OPTIONS.map((o) => (
+                      <option key={o} value={o}>
+                        +{parseRValue(o)}R ({o})
+                      </option>
+                    ))}
+                    <option value="-1">-1R ({tr("out.Loss", "Loss")})</option>
+                    <option value="missed">{tr("out.Missed", "Missed")}</option>
+                    <option value="custom">{tr("journal.customR")}</option>
+                  </select>
+                  {form.rr === "custom" && (
+                    <Input
+                      type="text"
+                      inputMode="decimal"
+                      placeholder="1/6, 3.5, 7R"
+                      autoComplete="off"
+                      value={form.custom_r}
+                      onChange={(e) => setForm({ ...form, custom_r: e.target.value })}
+                    />
+                  )}
+                </div>
               </Field>
             </div>
-            <Field label={tr("journal.field.url")}>
-              <Input
-                type="url"
-                placeholder="https://www.tradingview.com/chart/…"
-                value={form.chart_url}
-                onChange={(e) => setForm({ ...form, chart_url: e.target.value })}
-              />
-            </Field>
-            <Field label={tr("journal.field.notes")}>
-              <Textarea
-                rows={4}
-                placeholder={tr("journal.notesPlaceholder")}
-                value={form.notes}
-                onChange={(e) => setForm({ ...form, notes: e.target.value })}
-              />
-            </Field>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>
                 {tr("journal.cancel")}
