@@ -7,10 +7,16 @@ import { useAuth } from "@/hooks/useAuth";
 import { useDeleteRow, useSetups, useTrades, useUpsertRow } from "@/lib/queries";
 import {
   CATEGORIES,
+  DEFAULT_PAIRS,
   DIRECTIONS,
   OUTCOMES,
+  categoryForPair,
   formatR,
+  loadCustomPairs,
+  normalizePair,
   parseRValue,
+  saveCustomPairs,
+  type Category,
   type Trade,
 } from "@/lib/trading";
 import { Button } from "@/components/ui/button";
