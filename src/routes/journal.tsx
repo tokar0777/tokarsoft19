@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { ExternalLink, Pencil, Plus, Trash2 } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { AppShell } from "@/components/AppShell";
 import { useAuth } from "@/hooks/useAuth";
@@ -22,7 +22,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog,
   DialogContent,
@@ -209,7 +208,6 @@ function JournalPage() {
               <th className="px-4 py-3 font-medium">{tr("journal.col.setup")}</th>
               <th className="px-4 py-3 font-medium">R</th>
               <th className="px-4 py-3 font-medium">{tr("journal.col.outcome")}</th>
-              <th className="px-4 py-3 font-medium">{tr("journal.col.chart")}</th>
               <th className="px-4 py-3 text-right font-medium">{tr("journal.col.actions")}</th>
             </tr>
           </thead>
