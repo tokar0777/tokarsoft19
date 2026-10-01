@@ -355,6 +355,10 @@ function JournalPage() {
                         ))}
                       </optgroup>
                     ))}
+                    {form.pair &&
+                      !CATEGORIES.some((c) =>
+                        [...DEFAULT_PAIRS[c], ...(customPairs[c] ?? [])].includes(form.pair),
+                      ) && <option value={form.pair}>{form.pair}</option>}
                     <option value="__new__">{tr("journal.addPair")}</option>
                   </select>
                   {addingPair && (
