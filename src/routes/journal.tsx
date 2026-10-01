@@ -128,10 +128,7 @@ function JournalPage() {
       pair: trade.pair,
       direction: trade.direction,
       setup_id: trade.setup_id ?? "",
-      realized_r: String(trade.realized_r ?? 0),
-      notes: trade.notes ?? "",
-      chart_url: trade.chart_url ?? "",
-      outcome: trade.outcome,
+      ...rrChoiceFor(trade),
     });
     setOpen(true);
   }
@@ -139,6 +136,10 @@ function JournalPage() {
   async function save(e: React.FormEvent) {
     e.preventDefault();
     const when = new Date(form.traded_at);
+    const missed = form.rr === "missed";
+    const loss = form.rr === "-1";
+    const realized_r = missed ? 0 : loss ? -1 : parseRValue(form.rr === "custom" ? form.custom_r : form.rr);
+    const outcome = missed ? "Missed" : loss ? "Loss" : realized_r === 0 ? "Break-Even" : "Win";
     const payload = {
       ...(form.id ? { id: form.id } : {}),
       traded_at: (Number.isNaN(when.getTime()) ? new Date() : when).toISOString(),
@@ -146,10 +147,10 @@ function JournalPage() {
       pair: form.pair.trim().toUpperCase(),
       direction: form.direction,
       setup_id: form.setup_id.trim() || null,
-      realized_r: parseRValue(form.realized_r),
-      notes: form.notes ?? "",
-      chart_url: form.chart_url.trim() || null,
-      outcome: form.outcome,
+      realized_r,
+      notes: "",
+      chart_url: null,
+      outcome,
     };
     try {
       await upsert.mutateAsync(payload);
