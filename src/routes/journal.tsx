@@ -94,6 +94,17 @@ function JournalPage() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<FormState>(emptyForm());
   const [outcomeFilter, setOutcomeFilter] = useState("All");
+  const [customPairs, setCustomPairs] = useState<Record<Category, string[]>>({
+    Crypto: [],
+    Forex: [],
+    Metals: [],
+  });
+  const [addingPair, setAddingPair] = useState(false);
+  const [newPair, setNewPair] = useState("");
+
+  useEffect(() => {
+    setCustomPairs(loadCustomPairs());
+  }, []);
 
   const setupName = useMemo(
     () => new Map(setups.map((s) => [s.id, s.name])),
