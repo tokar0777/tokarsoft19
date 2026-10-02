@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
-import { BarChart3, BookOpen, Bot, Shield, LogOut, Menu, X, Activity, Send, Youtube, ShieldCheck, Clock } from "lucide-react";
+import { BarChart3, BookOpen, Bot, Shield, LogOut, Menu, X, Activity, Send, Youtube, ShieldCheck, Clock, Home } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/lib/queries";
 import { supabase } from "@/integrations/supabase/client";
@@ -225,6 +225,14 @@ export function AppShell({
             {subtitle && <p className="truncate text-xs text-muted-foreground">{subtitle}</p>}
           </div>
           <div className="ml-auto flex items-center gap-2">
+            <Link
+              to="/"
+              aria-label={t("nav.home")}
+              title={t("nav.home")}
+              className="flex size-8 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:text-primary"
+            >
+              <Home className="size-4" />
+            </Link>
             <Link
               to="/profile"
               aria-label={t("shell.profile")}
