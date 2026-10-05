@@ -213,7 +213,6 @@ const EN: Dict = {
   "status.rejected": "Rejected",
 
   // landing
-  "landing.badge": "SMC Trading Terminal",
   "landing.title": "Trading journal and analytics",
   "landing.sub": "Log trades, track stats in % and follow your risk rules — everything in one place.",
   "nav.home": "About Project",
@@ -434,7 +433,6 @@ const UA: Dict = {
   "status.rejected": "Відхилено",
 
   // landing
-  "landing.badge": "SMC Торговий термінал",
   "landing.title": "Журнал угод та аналітика",
   "landing.sub": "Записуйте угоди, відстежуйте статистику у % та дотримуйтесь правил ризику — все в одному місці.",
   "nav.home": "Про проект",
@@ -655,7 +653,6 @@ const RU: Dict = {
   "status.rejected": "Отклонён",
 
   // landing
-  "landing.badge": "SMC Торговый терминал",
   "landing.title": "Журнал сделок и аналитика",
   "landing.sub": "Записывайте сделки, отслеживайте статистику в % и следуйте правилам риска — всё в одном месте.",
   "nav.home": "О проекте",
