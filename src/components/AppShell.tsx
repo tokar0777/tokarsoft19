@@ -229,9 +229,10 @@ export function AppShell({
               to="/"
               aria-label={t("nav.home")}
               title={t("nav.home")}
-              className="flex size-8 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:text-primary"
+              className="flex h-8 items-center justify-center gap-2 rounded-md border border-border px-2.5 text-xs font-medium text-muted-foreground transition-colors hover:text-primary"
             >
               <Home className="size-4" />
+              <span className="hidden md:inline">{t("nav.home")}</span>
             </Link>
             <Link
               to="/profile"

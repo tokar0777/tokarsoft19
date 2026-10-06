@@ -1,5 +1,5 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { Activity, ArrowRight, BarChart3, BookOpen, Bot, Send, Shield, Youtube } from "lucide-react";
+import { Activity, ArrowRight, Send, Youtube } from "lucide-react";
 import { LANGS, useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
@@ -9,15 +9,15 @@ export const Route = createFileRoute("/")({
       { title: "TOKARsoft19" },
       {
         name: "description",
-        content:
-          "TOKARsoft19 is a professional Smart Money Concepts trading journal: trade logging, setup analytics, risk rules and an AI SMC chart validator.",
+        content: "TOKARsoft19 is a trading journal with percentage analytics and risk control.",
       },
       { property: "og:title", content: "TOKARsoft19" },
       {
         property: "og:description",
-        content:
-          "Structured trade journal, setup analytics, risk rules and AI SMC validation for ICT traders.",
+        content: "Trading journal, percentage analytics and risk control in one terminal.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: LandingPage,
@@ -26,11 +26,10 @@ export const Route = createFileRoute("/")({
 function LandingPage() {
   const { t, lang, setLang } = useI18n();
 
-  const features = [
-    { icon: BookOpen, title: t("landing.f1t"), desc: t("landing.f1d") },
-    { icon: BarChart3, title: t("landing.f2t"), desc: t("landing.f2d") },
-    { icon: Shield, title: t("landing.f3t"), desc: t("landing.f3d") },
-    { icon: Bot, title: t("landing.f4t"), desc: t("landing.f4d") },
+  const stats = [
+    { value: "%", label: t("landing.stat.pnl") },
+    { value: "R:R", label: t("landing.stat.rr") },
+    { value: "6", label: t("landing.stat.periods") },
   ];
 
   return (
@@ -77,9 +76,9 @@ function LandingPage() {
       </header>
 
       <main>
-        <section className="mx-auto max-w-6xl px-4 pb-16 pt-16 text-center md:px-8 md:pt-24">
+        <section className="mx-auto max-w-6xl px-4 pb-12 pt-16 text-center md:px-8 md:pt-24">
           <h1 className="mx-auto max-w-3xl text-4xl font-bold leading-tight tracking-tight md:text-5xl">
-            {t("landing.title")}
+            TOKARsoft19
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-base text-muted-foreground md:text-lg">
             {t("landing.sub")}
@@ -100,17 +99,14 @@ function LandingPage() {
           </div>
         </section>
 
-        <section className="mx-auto grid max-w-6xl gap-4 px-4 pb-20 md:grid-cols-2 md:px-8 lg:grid-cols-4">
-          {features.map((f) => (
+        <section className="mx-auto grid max-w-3xl grid-cols-3 border-y border-border px-4 md:px-8">
+          {stats.map((stat) => (
             <div
-              key={f.title}
-              className="rounded-lg border border-border bg-surface p-5 transition-colors hover:border-primary/40"
+              key={stat.label}
+              className="border-r border-border px-2 py-7 text-center last:border-r-0 md:py-9"
             >
-              <span className="flex size-10 items-center justify-center rounded-md bg-primary/15 text-primary">
-                <f.icon className="size-5" />
-              </span>
-              <h2 className="mt-4 text-sm font-semibold tracking-tight">{f.title}</h2>
-              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{f.desc}</p>
+              <p className="tabular text-2xl font-semibold text-primary md:text-3xl">{stat.value}</p>
+              <p className="mt-2 text-xs text-muted-foreground md:text-sm">{stat.label}</p>
             </div>
           ))}
         </section>

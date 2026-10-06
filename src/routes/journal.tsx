@@ -8,7 +8,6 @@ import { useDeleteRow, useSetups, useTrades, useUpsertRow } from "@/lib/queries"
 import {
   CATEGORIES,
   DEFAULT_PAIRS,
-  DIRECTIONS,
   OUTCOMES,
   categoryForPair,
   formatR,
@@ -47,6 +46,8 @@ export const Route = createFileRoute("/journal")({
         property: "og:description",
         content: "Log and review every Smart Money Concepts execution with full confluence notes.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: JournalPage,
@@ -383,23 +384,6 @@ function JournalPage() {
                     </div>
                   )}
                 </div>
-              </Field>
-              <Field label={tr("journal.field.direction")}>
-                <NativeSelect
-                  value={form.direction}
-                  onChange={(v) => setForm({ ...form, direction: v })}
-                  options={[...DIRECTIONS]}
-                  labels={Object.fromEntries(DIRECTIONS.map((d) => [d, tr(`dir.${d}`, d)]))}
-                />
-              </Field>
-              <Field label={tr("journal.field.setup")}>
-                <NativeSelect
-                  value={form.setup_id}
-                  onChange={(v) => setForm({ ...form, setup_id: v })}
-                  options={setups.map((s) => s.id)}
-                  labels={Object.fromEntries(setups.map((s) => [s.id, s.name]))}
-                  placeholder={tr("journal.noSetup")}
-                />
               </Field>
               <Field label={tr("journal.field.r")}>
                 <div className="space-y-2">

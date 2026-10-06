@@ -213,8 +213,8 @@ const EN: Dict = {
   "status.rejected": "Rejected",
 
   // landing
-  "landing.title": "Trading journal and analytics",
-  "landing.sub": "Log trades, track stats in % and follow your risk rules — everything in one place.",
+  "landing.title": "TOKARsoft19",
+  "landing.sub": "Trading journal, percentage analytics and risk control.",
   "nav.home": "About Project",
   "landing.cta": "Launch Terminal",
   "landing.ctaSignIn": "Sign In",
@@ -226,6 +226,9 @@ const EN: Dict = {
   "landing.f3d": "Your money-management checklist and setup library.",
   "landing.f4t": "SMC AI Validator",
   "landing.f4d": "Charts validated by strict SMC rules.",
+  "landing.stat.pnl": "P&L tracking",
+  "landing.stat.rr": "Automatic result",
+  "landing.stat.periods": "Analytics periods",
 
   // validator coming soon
   "val.soon.badge": "AI SMC Engine — In Development",
@@ -433,8 +436,8 @@ const UA: Dict = {
   "status.rejected": "Відхилено",
 
   // landing
-  "landing.title": "Журнал угод та аналітика",
-  "landing.sub": "Записуйте угоди, відстежуйте статистику у % та дотримуйтесь правил ризику — все в одному місці.",
+  "landing.title": "TOKARsoft19",
+  "landing.sub": "Журнал угод, аналітика у відсотках і контроль ризику.",
   "nav.home": "Про проект",
   "landing.cta": "Запустити термінал",
   "landing.ctaSignIn": "Увійти",
@@ -446,6 +449,9 @@ const UA: Dict = {
   "landing.f3d": "Ваш чеклист мані-менеджменту та бібліотека сетапів.",
   "landing.f4t": "SMC AI Валідатор",
   "landing.f4d": "Перевірка графіків за строгими SMC-правилами.",
+  "landing.stat.pnl": "Облік P&L",
+  "landing.stat.rr": "Автоматичний результат",
+  "landing.stat.periods": "Періодів аналітики",
 
   // validator coming soon
   "val.soon.badge": "AI SMC Engine — У розробці",
@@ -653,8 +659,8 @@ const RU: Dict = {
   "status.rejected": "Отклонён",
 
   // landing
-  "landing.title": "Журнал сделок и аналитика",
-  "landing.sub": "Записывайте сделки, отслеживайте статистику в % и следуйте правилам риска — всё в одном месте.",
+  "landing.title": "TOKARsoft19",
+  "landing.sub": "Журнал сделок, аналитика в процентах и контроль риска.",
   "nav.home": "О проекте",
   "landing.cta": "Запустить терминал",
   "landing.ctaSignIn": "Войти",
@@ -666,6 +672,9 @@ const RU: Dict = {
   "landing.f3d": "Ваш чеклист мани-менеджмента и библиотека сетапов.",
   "landing.f4t": "SMC AI Валидатор",
   "landing.f4d": "Проверка графиков по строгим SMC-правилам.",
+  "landing.stat.pnl": "Учёт P&L",
+  "landing.stat.rr": "Автоматический результат",
+  "landing.stat.periods": "Периодов аналитики",
 
   // validator coming soon
   "val.soon.badge": "AI SMC Engine — В разработке",
