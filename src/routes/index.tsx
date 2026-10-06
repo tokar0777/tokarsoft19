@@ -16,6 +16,8 @@ export const Route = createFileRoute("/")({
         property: "og:description",
         content: "Trading journal, percentage analytics and risk control in one terminal.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: LandingPage,

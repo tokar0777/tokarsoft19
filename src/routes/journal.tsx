@@ -46,6 +46,8 @@ export const Route = createFileRoute("/journal")({
         property: "og:description",
         content: "Log and review every Smart Money Concepts execution with full confluence notes.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: JournalPage,
