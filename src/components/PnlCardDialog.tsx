@@ -18,7 +18,7 @@ const L = {
   RU: { btn: "PnL карточка", title: "PnL карточка", nick: "Никнейм", week: "Неделя", month: "Месяц", save: "Сохранить в галерею", share: "Поделиться", trades: "Сделки", wr: "Винрейт", pnl: "PnL", wk: "7 дней", mo: "30 дней" },
 } as const;
 
-function draw(opts: { nick: string; pct: number; label: string; range: string; trades: number; wr: number; tx: (typeof L)["EN"] }) {
+function draw(opts: { nick: string; pct: number; label: string; range: string; trades: number; wr: number; tx: Record<keyof (typeof L)["EN"], string> }) {
   const W = 1080, H = 1350;
   const c = document.createElement("canvas");
   c.width = W; c.height = H;
