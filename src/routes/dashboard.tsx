@@ -13,6 +13,7 @@ import {
 } from "recharts";
 import { Activity, ChevronLeft, ChevronRight, Percent, Sigma, Target, Trophy } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { PnlCardDialog } from "@/components/PnlCardDialog";
 import { useAuth } from "@/hooks/useAuth";
 import { useTrades } from "@/lib/queries";
 import {
@@ -91,6 +92,7 @@ function DashboardPage() {
           value={timeframe}
           onChange={(v) => setTimeframe(v as Timeframe)}
         />
+        <PnlCardDialog trades={trades} />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
