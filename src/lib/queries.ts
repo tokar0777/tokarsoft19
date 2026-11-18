@@ -104,6 +104,8 @@ export type Profile = {
   email: string;
   status: AccountStatus;
   created_at: string;
+  nickname: string | null;
+  pending_nickname: string | null;
 };
 
 export function useProfile(enabled: boolean) {
@@ -116,7 +118,7 @@ export function useProfile(enabled: boolean) {
       if (!userId) return null;
 
       const [{ data: profile, error }, { data: roles, error: roleError }] = await Promise.all([
-        supabase.from("profiles").select("id,email,status,created_at").eq("id", userId).maybeSingle(),
+        supabase.from("profiles").select("id,email,status,created_at,nickname,pending_nickname").eq("id", userId).maybeSingle(),
         supabase.from("user_roles").select("role").eq("user_id", userId),
       ]);
       if (error) throw error;
@@ -137,7 +139,7 @@ export function useAllProfiles(enabled: boolean) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("id,email,status,created_at")
+        .select("id,email,status,created_at,nickname,pending_nickname")
         .order("created_at", { ascending: false });
       if (error) throw error;
       return (data ?? []) as Profile[];
@@ -156,5 +158,28 @@ export function useSetUserStatus() {
       qc.invalidateQueries({ queryKey: ["all_profiles"] });
       qc.invalidateQueries({ queryKey: ["profile"] });
     },
+  });
+}
+
+export function useRequestNickname() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (nick: string) => {
+      const { data, error } = await supabase.rpc("request_nickname", { _nick: nick });
+      if (error) throw error;
+      return data as string;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["profile"] }),
+  });
+}
+
+export function useReviewNickname() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, approve }: { id: string; approve: boolean }) => {
+      const { error } = await supabase.rpc("review_nickname", { _user: id, _approve: approve });
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["all_profiles"] }),
   });
 }

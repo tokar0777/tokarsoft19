@@ -19,6 +19,8 @@ export type Database = {
           created_at: string
           email: string
           id: string
+          nickname: string | null
+          pending_nickname: string | null
           status: Database["public"]["Enums"]["account_status"]
           updated_at: string
         }
@@ -26,6 +28,8 @@ export type Database = {
           created_at?: string
           email?: string
           id: string
+          nickname?: string | null
+          pending_nickname?: string | null
           status?: Database["public"]["Enums"]["account_status"]
           updated_at?: string
         }
@@ -33,6 +37,8 @@ export type Database = {
           created_at?: string
           email?: string
           id?: string
+          nickname?: string | null
+          pending_nickname?: string | null
           status?: Database["public"]["Enums"]["account_status"]
           updated_at?: string
         }
@@ -189,6 +195,11 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      request_nickname: { Args: { _nick: string }; Returns: string }
+      review_nickname: {
+        Args: { _approve: boolean; _user: string }
+        Returns: undefined
       }
     }
     Enums: {

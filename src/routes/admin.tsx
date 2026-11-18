@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { Check, X } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { useAuth } from "@/hooks/useAuth";
-import { useAllProfiles, useProfile, useSetUserStatus, type AccountStatus } from "@/lib/queries";
+import { useAllProfiles, useProfile, useSetUserStatus, useReviewNickname, type AccountStatus } from "@/lib/queries";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
@@ -36,6 +36,7 @@ function AdminPage() {
   const isAdmin = !!access?.isAdmin;
   const { data: users = [], isLoading } = useAllProfiles(isAdmin);
   const setStatus = useSetUserStatus();
+  const reviewNick = useReviewNickname();
 
   const update = (id: string, status: AccountStatus) =>
     setStatus.mutate(
@@ -75,7 +76,21 @@ function AdminPage() {
             )}
             {users.map((u) => (
               <tr key={u.id} className="border-b border-border/60 last:border-0">
-                <td className="px-4 py-3">{u.email || "—"}</td>
+                <td className="px-4 py-3">
+                  <div>{u.email || "—"}</div>
+                  <div className="text-xs text-muted-foreground">@{u.nickname ?? "—"}</div>
+                  {u.pending_nickname && (
+                    <div className="mt-1 flex items-center gap-2 text-xs">
+                      <span className="text-primary">→ @{u.pending_nickname}</span>
+                      <Button size="sm" variant="outline" className="h-6 px-2" onClick={() => reviewNick.mutate({ id: u.id, approve: true }, { onSuccess: () => toast.success("OK") })}>
+                        <Check className="size-3" />
+                      </Button>
+                      <Button size="sm" variant="outline" className="h-6 px-2" onClick={() => reviewNick.mutate({ id: u.id, approve: false })}>
+                        <X className="size-3" />
+                      </Button>
+                    </div>
+                  )}
+                </td>
                 <td className="tabular px-4 py-3 text-muted-foreground">
                   {new Date(u.created_at).toLocaleDateString()}
                 </td>
