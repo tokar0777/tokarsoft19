@@ -118,8 +118,8 @@ function DashboardPage() {
         />
       </div>
 
-      <div className="mt-4 grid gap-4 lg:grid-cols-3">
-        <div className="rounded-lg border border-border bg-card p-5 lg:col-span-2">
+      <div className="mt-4 grid gap-4">
+        <div className="rounded-lg border border-border bg-card p-5">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-sm font-semibold tracking-wide">{t("dash.equity")}</h2>
             <span className="tabular text-xs text-muted-foreground">{filtered.length} {t("dash.trades")}</span>
@@ -161,34 +161,6 @@ function DashboardPage() {
           )}
         </div>
 
-        <div className="rounded-lg border border-border bg-card p-5">
-          <h2 className="mb-4 text-sm font-semibold tracking-wide">{t("dash.winLoss")}</h2>
-          {filtered.length === 0 ? (
-            <EmptyState loading={isLoading} />
-          ) : (
-            <div className="h-72">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={byCategory}>
-                  <CartesianGrid stroke="var(--color-border)" vertical={false} />
-                  <XAxis dataKey="category" stroke="var(--color-muted-foreground)" fontSize={11} tickLine={false} />
-                  <YAxis stroke="var(--color-muted-foreground)" fontSize={11} tickLine={false} width={28} allowDecimals={false} />
-                  <Tooltip
-                    cursor={{ fill: "var(--color-muted)" }}
-                    contentStyle={{
-                      background: "var(--color-popover)",
-                      border: "1px solid var(--color-border)",
-                      borderRadius: 8,
-                      color: "var(--color-popover-foreground)",
-                      fontSize: 12,
-                    }}
-                  />
-                  <Bar dataKey="wins" fill="var(--color-chart-1)" radius={[3, 3, 0, 0]} />
-                  <Bar dataKey="losses" fill="var(--color-chart-2)" radius={[3, 3, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          )}
-        </div>
       </div>
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2">

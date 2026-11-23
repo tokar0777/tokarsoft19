@@ -314,6 +314,14 @@ function JournalPage() {
                   onChange={(e) => setForm({ ...form, traded_at: e.target.value })}
                 />
               </Field>
+              <Field label={tr("journal.field.direction")}>
+                <NativeSelect
+                  value={form.direction}
+                  onChange={(v) => setForm({ ...form, direction: v })}
+                  options={["Long", "Short"]}
+                  labels={{ Long: tr("dir.Long", "Long"), Short: tr("dir.Short", "Short") }}
+                />
+              </Field>
               <Field label={tr("journal.field.pair")}>
                 <div className="space-y-2">
                   <select

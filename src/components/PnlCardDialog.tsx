@@ -10,17 +10,17 @@ import { TIMEFRAME_DAYS, computeStats, equityCurve, filterTrades, type Trade } f
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile, useRequestNickname } from "@/lib/queries";
 
-type Period = "Daily" | "Weekly" | "Monthly";
-type Variant = "neon" | "minimal" | "bold" | "gold" | "stripes";
-const VARIANTS: Variant[] = ["neon", "minimal", "bold", "gold", "stripes"];
+type Period = "Trade" | "Daily" | "Weekly" | "Monthly";
+type Variant = "neon" | "bold" | "gold";
+const VARIANTS: Variant[] = ["neon", "bold", "gold"];
 
 const L = {
-  EN: { btn: "PnL card", title: "Share PnL card", nick: "Nickname", week: "Week", month: "Month", save: "Save to gallery", share: "Share", trades: "Trades", wr: "Win rate", pnl: "PnL", wk: "7 days", mo: "30 days", day: "Day", d1: "24h", style: "Style", setNick: "Set nickname (once)", change: "Request change", pending: "Awaiting admin approval", sent: "Change request sent to admin", saved: "Nickname saved" },
-  UA: { btn: "PnL картка", title: "PnL картка", nick: "Нікнейм", week: "Тиждень", month: "Місяць", save: "Зберегти в галерею", share: "Поділитися", trades: "Угоди", wr: "Вінрейт", pnl: "PnL", wk: "7 днів", mo: "30 днів", day: "День", d1: "24 год", style: "Стиль", setNick: "Встановити нікнейм (один раз)", change: "Запросити зміну", pending: "Очікує підтвердження адміна", sent: "Запит на зміну надіслано адміну", saved: "Нікнейм збережено" },
-  RU: { btn: "PnL карточка", title: "PnL карточка", nick: "Никнейм", week: "Неделя", month: "Месяц", save: "Сохранить в галерею", share: "Поделиться", trades: "Сделки", wr: "Винрейт", pnl: "PnL", wk: "7 дней", mo: "30 дней", day: "День", d1: "24 ч", style: "Стиль", setNick: "Установить никнейм (один раз)", change: "Запросить смену", pending: "Ожидает подтверждения админа", sent: "Запрос на смену отправлен админу", saved: "Никнейм сохранён" },
+  EN: { tradeP: "Trade", pick: "Choose trade", btn: "PnL card", title: "Share PnL card", nick: "Nickname", week: "Week", month: "Month", save: "Save to gallery", share: "Share", trades: "Trades", wr: "Win rate", pnl: "PnL", wk: "7 days", mo: "30 days", day: "Day", d1: "24h", style: "Style", setNick: "Set nickname (once)", change: "Request change", pending: "Awaiting admin approval", sent: "Change request sent to admin", saved: "Nickname saved" },
+  UA: { tradeP: "Угода", pick: "Оберіть угоду", btn: "PnL картка", title: "PnL картка", nick: "Нікнейм", week: "Тиждень", month: "Місяць", save: "Зберегти в галерею", share: "Поділитися", trades: "Угоди", wr: "Вінрейт", pnl: "PnL", wk: "7 днів", mo: "30 днів", day: "День", d1: "24 год", style: "Стиль", setNick: "Встановити нікнейм (один раз)", change: "Запросити зміну", pending: "Очікує підтвердження адміна", sent: "Запит на зміну надіслано адміну", saved: "Нікнейм збережено" },
+  RU: { tradeP: "Сделка", pick: "Выберите сделку", btn: "PnL карточка", title: "PnL карточка", nick: "Никнейм", week: "Неделя", month: "Месяц", save: "Сохранить в галерею", share: "Поделиться", trades: "Сделки", wr: "Винрейт", pnl: "PnL", wk: "7 дней", mo: "30 дней", day: "День", d1: "24 ч", style: "Стиль", setNick: "Установить никнейм (один раз)", change: "Запросить смену", pending: "Ожидает подтверждения админа", sent: "Запрос на смену отправлен админу", saved: "Никнейм сохранён" },
 } as const;
 
-function draw(opts: { variant: Variant; curve: number[]; nick: string; pct: number; label: string; range: string; trades: number; wr: number; tx: Record<keyof (typeof L)["EN"], string> }) {
+function draw(opts: { variant: Variant; curve: number[]; nick: string; pct: number; label: string; range: string; trades: number; wr: number; dir?: string; pair?: string; tx: Record<keyof (typeof L)["EN"], string> }) {
   const W = 1080, H = 1350;
   const c = document.createElement("canvas");
   c.width = W; c.height = H;
@@ -58,6 +58,21 @@ function draw(opts: { variant: Variant; curve: number[]; nick: string; pct: numb
     g.stroke();
   }
 
+  if (opts.dir) {
+    const long = opts.dir === "Long";
+    // direction accent: Long = rising wedge bottom-left, Short = falling wedge top-right
+    g.save(); g.globalAlpha = 0.18; g.fillStyle = win ? "#34d399" : "#f87171";
+    g.beginPath();
+    if (long) { g.moveTo(0, H); g.lineTo(W, H * 0.55); g.lineTo(W, H); }
+    else { g.moveTo(0, 0); g.lineTo(W, 0); g.lineTo(W, H * 0.45); }
+    g.closePath(); g.fill(); g.restore();
+    const txt = `${long ? "▲ LONG" : "▼ SHORT"}${opts.pair ? "  " + opts.pair : ""}`;
+    g.font = "bold 40px 'JetBrains Mono', monospace";
+    const w = g.measureText(txt).width + 60;
+    g.fillStyle = long ? "rgba(16,185,129,0.9)" : "rgba(239,68,68,0.9)";
+    g.beginPath(); g.roundRect(80, 250, w, 76, 38); g.fill();
+    g.fillStyle = "#ffffff"; g.fillText(txt, 110, 302);
+  }
   g.fillStyle = "#ffffff";
   g.font = "bold 56px 'JetBrains Mono', monospace";
   g.fillText("TOKARsoft19", 80, 130);
@@ -65,7 +80,7 @@ function draw(opts: { variant: Variant; curve: number[]; nick: string; pct: numb
   g.fillText(`${opts.label}: ${opts.range}`, 80, 190);
 
   g.font = "500 40px sans-serif"; g.fillStyle = "rgba(255,255,255,0.8)";
-  g.fillText(opts.tx.pnl, 80, 380);
+  if (!opts.dir) g.fillText(opts.tx.pnl, 80, 380);
   const pctText = `${win ? "+" : ""}${opts.pct.toFixed(2)}%`;
   g.fillStyle = v === "bold" ? "#ffffff" : v === "gold" ? (win ? "#f0b90b" : "#f6465d") : win ? "#6ee7b7" : "#fca5a5";
   if (v === "bold") { g.font = "bold 230px 'JetBrains Mono', monospace"; g.textAlign = "center"; g.fillText(pctText, W / 2, 720); g.textAlign = "left"; }
@@ -99,22 +114,26 @@ export function PnlCardDialog({ trades }: { trades: Trade[] }) {
   const [url, setUrl] = useState<string | null>(null);
   const nick = profile?.nickname ?? "";
 
-  const periodTrades = useMemo(() => filterTrades(trades, "All", period), [trades, period]);
+  const recent = useMemo(() => [...trades].filter((t) => t.outcome !== "Missed").sort((a, b) => b.traded_at.localeCompare(a.traded_at)).slice(0, 50), [trades]);
+  const [tradeId, setTradeId] = useState<string>("");
+  const one = period === "Trade" ? recent.find((t) => t.id === tradeId) ?? recent[0] : undefined;
+  const periodTrades = useMemo(() => (period === "Trade" ? (one ? [one] : []) : filterTrades(trades, "All", period)), [trades, period, one]);
   const stats = useMemo(() => computeStats(periodTrades), [periodTrades]);
   const curve = useMemo(() => equityCurve(periodTrades).map((p) => p.r), [periodTrades]);
   const pct = stats.totalR; // 1R = 1%
-  const label = period === "Daily" ? tx.day : period === "Weekly" ? tx.week : tx.month;
+  const label = period === "Trade" ? tx.tradeP : period === "Daily" ? tx.day : period === "Weekly" ? tx.week : tx.month;
   const range = useMemo(() => {
+    if (period === "Trade") return one ? new Date(one.traded_at).toLocaleDateString("uk-UA") : "—";
     const end = new Date();
-    const start = new Date(end.getTime() - TIMEFRAME_DAYS[period] * 86400000);
+    const start = new Date(end.getTime() - TIMEFRAME_DAYS[period as Exclude<Period, "Trade">] * 86400000);
     const f = (d: Date, y = true) => d.toLocaleDateString("uk-UA", { day: "2-digit", month: "2-digit", ...(y ? { year: "numeric" } : {}) });
     return period === "Daily" ? f(end) : `${f(start, false)} – ${f(end)}`;
-  }, [period, open]);
+  }, [period, open, one]);
 
   useEffect(() => {
     if (!open) return;
-    setUrl(draw({ variant, curve, nick, pct, label, range, trades: stats.total, wr: stats.winRate, tx }).toDataURL("image/png"));
-  }, [open, variant, curve, nick, pct, label, range, stats.total, stats.winRate, tx]);
+    setUrl(draw({ variant, curve, nick, pct, label, range, trades: stats.total, wr: stats.winRate, ...(one ? { dir: one.direction, pair: one.pair } : {}), tx }).toDataURL("image/png"));
+  }, [open, variant, curve, nick, pct, label, range, stats.total, stats.winRate, tx, one]);
 
   const submitNick = () =>
     reqNick.mutate(draft, {
@@ -143,13 +162,23 @@ export function PnlCardDialog({ trades }: { trades: Trade[] }) {
       </DialogTrigger>
       <DialogContent className="max-h-[95vh] overflow-y-auto sm:max-w-md">
         <DialogHeader><DialogTitle>{tx.title}</DialogTitle></DialogHeader>
-        <div className="grid grid-cols-3 gap-2">
-          {(["Daily", "Weekly", "Monthly"] as Period[]).map((p) => (
+        <div className="grid grid-cols-4 gap-2">
+          {(["Trade", "Daily", "Weekly", "Monthly"] as Period[]).map((p) => (
             <Button key={p} variant={period === p ? "default" : "outline"} size="sm" onClick={() => setPeriod(p)}>
-              {p === "Daily" ? tx.day : p === "Weekly" ? tx.week : tx.month}
+              {p === "Trade" ? tx.tradeP : p === "Daily" ? tx.day : p === "Weekly" ? tx.week : tx.month}
             </Button>
           ))}
         </div>
+        {period === "Trade" && (
+          <div className="space-y-1">
+            <Label>{tx.pick}</Label>
+            <select className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm" value={one?.id ?? ""} onChange={(e) => setTradeId(e.target.value)}>
+              {recent.map((t) => (
+                <option key={t.id} value={t.id}>{new Date(t.traded_at).toLocaleDateString("uk-UA")} · {t.pair} · {t.direction} · {Number(t.realized_r) > 0 ? "+" : ""}{Number(t.realized_r)}R</option>
+              ))}
+            </select>
+          </div>
+        )}
         <div className="space-y-1">
           <Label>{tx.style}</Label>
           <div className="grid grid-cols-3 gap-2">
