@@ -10,7 +10,6 @@ import { cn } from "@/lib/utils";
 const NAV = [
   { to: "/dashboard", labelKey: "nav.dashboard", icon: BarChart3 },
   { to: "/journal", labelKey: "nav.journal", icon: BookOpen },
-  { to: "/validator", labelKey: "nav.validator", icon: Bot },
   { to: "/risk", labelKey: "nav.risk", icon: Shield },
 ] as const;
 
@@ -187,24 +186,6 @@ export function AppShell({
         </nav>
 
         <div className="border-t border-sidebar-border p-3">
-          <div className="grid grid-cols-3 gap-2 pb-3">
-            {SOCIALS.map((s) => (
-              <a
-                key={s.labelKey}
-                href={s.href}
-                target="_blank"
-                rel="noreferrer noopener"
-                aria-label={t(s.labelKey)}
-                title={t(s.labelKey)}
-                className="flex items-center justify-center gap-1.5 rounded-md border border-sidebar-border px-2 py-1.5 text-xs leading-none text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-primary"
-              >
-                <span className="flex size-3.5 items-center justify-center">
-                  <s.icon className="size-3.5" />
-                </span>
-                {t(s.labelKey)}
-              </a>
-            ))}
-          </div>
           <p className="truncate px-2 pb-2 text-xs text-muted-foreground">{user?.email}</p>
           <button
             onClick={signOut}
@@ -243,21 +224,6 @@ export function AppShell({
             >
               {(user?.email ?? "?").slice(0, 1)}
             </Link>
-            <div className="hidden items-center gap-1 sm:flex">
-              {SOCIALS.map((s) => (
-                <a
-                  key={s.labelKey}
-                  href={s.href}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  aria-label={t(s.labelKey)}
-                  title={t(s.labelKey)}
-                  className="flex size-8 items-center justify-center rounded-md border border-border text-muted-foreground transition-colors hover:text-primary"
-                >
-                  <s.icon className="size-4" />
-                </a>
-              ))}
-            </div>
             <LanguageSelector />
           </div>
         </header>

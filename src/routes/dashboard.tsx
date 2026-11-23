@@ -79,13 +79,6 @@ function DashboardPage() {
     <AppShell title={t("dash.title")} subtitle={t("dash.subtitle")}>
       <div className="mb-6 flex flex-col gap-3 rounded-lg border border-border bg-card p-3 md:flex-row md:items-center md:justify-between">
         <SegmentGroup
-          label={t("dash.assetClass")}
-          options={FILTERS as unknown as string[]}
-          renderOption={(o) => (o === "All" ? t("f.All") : t(`cat.${o}`, o))}
-          value={category}
-          onChange={setCategory}
-        />
-        <SegmentGroup
           label={t("dash.period")}
           options={TIMEFRAMES as unknown as string[]}
           renderOption={(o) => t(`tf.${o}`, o)}

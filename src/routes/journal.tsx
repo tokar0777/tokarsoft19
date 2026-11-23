@@ -143,7 +143,7 @@ function JournalPage() {
     const payload = {
       ...(form.id ? { id: form.id } : {}),
       traded_at: (Number.isNaN(when.getTime()) ? new Date() : when).toISOString(),
-      category: form.category,
+      category: categoryForPair(form.pair, customPairs) ?? form.category,
       pair: form.pair.trim().toUpperCase(),
       direction: form.direction,
       setup_id: form.setup_id.trim() || null,
@@ -314,14 +314,6 @@ function JournalPage() {
                   onChange={(e) => setForm({ ...form, traded_at: e.target.value })}
                 />
               </Field>
-              <Field label={tr("journal.field.category")}>
-                <NativeSelect
-                  value={form.category}
-                  onChange={(v) => setForm({ ...form, category: v })}
-                  options={[...CATEGORIES]}
-                  labels={Object.fromEntries(CATEGORIES.map((c) => [c, tr(`cat.${c}`, c)]))}
-                />
-              </Field>
               <Field label={tr("journal.field.pair")}>
                 <div className="space-y-2">
                   <select
@@ -334,7 +326,7 @@ function JournalPage() {
                         return;
                       }
                       const cat = categoryForPair(v, customPairs);
-                      setForm({ ...form, pair: v, category: cat ?? form.category });
+                      setForm({ ...form, pair: v, category: cat ?? "Forex" });
                     }}
                     className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
@@ -367,7 +359,7 @@ function JournalPage() {
                         onClick={() => {
                           const p = normalizePair(newPair);
                           if (!p) return;
-                          const cat = categoryForPair(p, customPairs) ?? (form.category as Category);
+                          const cat = categoryForPair(p, customPairs) ?? ("Forex" as Category);
                           const next = {
                             ...customPairs,
                             [cat]: Array.from(new Set([...(customPairs[cat] ?? []), p])),
