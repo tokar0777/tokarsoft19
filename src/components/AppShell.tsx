@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
-import { BarChart3, BookOpen, Bot, Shield, LogOut, Menu, X, Activity, Send, Youtube, ShieldCheck, Clock, Home } from "lucide-react";
+import { BarChart3, BookOpen, Shield, LogOut, Menu, X, Activity, Send, ShieldCheck, Clock, Home } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/lib/queries";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,12 +14,6 @@ const NAV = [
 ] as const;
 
 const SUPPORT_TELEGRAM = "https://t.me/vadyaa_77";
-
-const SOCIALS = [
-  { href: "https://t.me/tokartrading", labelKey: "shell.telegram", icon: Send },
-  { href: SUPPORT_TELEGRAM, labelKey: "shell.support", icon: Send },
-  { href: "https://youtube.com/@tokarsss?si=Y3kig7daZaRmPxTi", labelKey: "shell.youtube", icon: Youtube },
-] as const;
 
 function LanguageSelector() {
   const { lang, setLang, t } = useI18n();

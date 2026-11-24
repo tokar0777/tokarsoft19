@@ -8,6 +8,13 @@
       "when": 1795013459430,
       "tag": "0000_nickname_approval",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1795525614300,
+      "tag": "0001_trading_declaration_and_full_setups",
+      "breakpoints": true
     }
   ]
 }

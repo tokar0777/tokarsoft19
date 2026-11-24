@@ -72,27 +72,42 @@ export type Database = {
         Row: {
           confluences: string[]
           created_at: string
+          custom_fields: Json
           description: string
+          entry_rules: string
           id: string
+          invalidation: string
           name: string
+          targets: string
+          timeframes: string
           updated_at: string
           user_id: string
         }
         Insert: {
           confluences?: string[]
           created_at?: string
+          custom_fields?: Json
           description?: string
+          entry_rules?: string
           id?: string
+          invalidation?: string
           name: string
+          targets?: string
+          timeframes?: string
           updated_at?: string
           user_id: string
         }
         Update: {
           confluences?: string[]
           created_at?: string
+          custom_fields?: Json
           description?: string
+          entry_rules?: string
           id?: string
+          invalidation?: string
           name?: string
+          targets?: string
+          timeframes?: string
           updated_at?: string
           user_id?: string
         }
@@ -162,6 +177,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      trading_declarations: {
+        Row: {
+          created_at: string
+          id: string
+          sections: Json
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          sections?: Json
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          sections?: Json
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {

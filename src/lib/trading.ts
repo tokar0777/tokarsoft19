@@ -72,13 +72,38 @@ export type Trade = {
   outcome: string;
 };
 
+export type SetupCustomField = {
+  label: string;
+  value: string;
+};
+
 export type Setup = {
   id: string;
   user_id: string;
   name: string;
   description: string;
   confluences: string[];
+  timeframes: string;
+  entry_rules: string;
+  invalidation: string;
+  targets: string;
+  custom_fields: SetupCustomField[];
   created_at: string;
+};
+
+export type DeclarationSection = {
+  id: string;
+  title: string;
+  content: string;
+};
+
+export type TradingDeclaration = {
+  id: string;
+  user_id: string;
+  title: string;
+  sections: DeclarationSection[];
+  created_at: string;
+  updated_at: string;
 };
 
 export type RiskRule = {

@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import type { RiskRule, Setup, Trade } from "./trading";
+import type { DeclarationSection, RiskRule, Setup, Trade, TradingDeclaration } from "./trading";
 
 export function useTrades(enabled: boolean) {
   return useQuery({
@@ -44,6 +44,42 @@ export function useRiskRules(enabled: boolean) {
       if (error) throw error;
       return (data ?? []) as unknown as RiskRule[];
     },
+  });
+}
+
+export function useTradingDeclaration(enabled: boolean) {
+  return useQuery({
+    queryKey: ["trading_declaration"],
+    enabled,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("trading_declarations")
+        .select("*")
+        .maybeSingle();
+      if (error) throw error;
+      return (data ?? null) as unknown as TradingDeclaration | null;
+    },
+  });
+}
+
+export function useSaveTradingDeclaration() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (values: { title: string; sections: DeclarationSection[] }) => {
+      const { data: auth, error: authError } = await supabase.auth.getUser();
+      if (authError) throw new Error(authError.message);
+      const userId = auth.user?.id;
+      if (!userId) throw new Error("Not signed in");
+
+      const { error } = await supabase
+        .from("trading_declarations")
+        .upsert(
+          { user_id: userId, title: values.title, sections: values.sections as unknown as never },
+          { onConflict: "user_id" },
+        );
+      if (error) throw new Error(error.message || "Failed to save declaration");
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["trading_declaration"] }),
   });
 }
 

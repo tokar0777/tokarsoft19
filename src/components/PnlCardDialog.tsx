@@ -10,14 +10,14 @@ import { TIMEFRAME_DAYS, computeStats, equityCurve, filterTrades, type Trade } f
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile, useRequestNickname } from "@/lib/queries";
 
-type Period = "Trade" | "Daily" | "Weekly" | "Monthly";
+type Period = "Trade" | "Daily" | "Weekly" | "Monthly" | "Overall";
 type Variant = "neon" | "bold" | "gold";
 const VARIANTS: Variant[] = ["neon", "bold", "gold"];
 
 const L = {
-  EN: { tradeP: "Trade", pick: "Choose trade", btn: "PnL card", title: "Share PnL card", nick: "Nickname", week: "Week", month: "Month", save: "Save to gallery", share: "Share", trades: "Trades", wr: "Win rate", pnl: "PnL", wk: "7 days", mo: "30 days", day: "Day", d1: "24h", style: "Style", setNick: "Set nickname (once)", change: "Request change", pending: "Awaiting admin approval", sent: "Change request sent to admin", saved: "Nickname saved" },
-  UA: { tradeP: "Угода", pick: "Оберіть угоду", btn: "PnL картка", title: "PnL картка", nick: "Нікнейм", week: "Тиждень", month: "Місяць", save: "Зберегти в галерею", share: "Поділитися", trades: "Угоди", wr: "Вінрейт", pnl: "PnL", wk: "7 днів", mo: "30 днів", day: "День", d1: "24 год", style: "Стиль", setNick: "Встановити нікнейм (один раз)", change: "Запросити зміну", pending: "Очікує підтвердження адміна", sent: "Запит на зміну надіслано адміну", saved: "Нікнейм збережено" },
-  RU: { tradeP: "Сделка", pick: "Выберите сделку", btn: "PnL карточка", title: "PnL карточка", nick: "Никнейм", week: "Неделя", month: "Месяц", save: "Сохранить в галерею", share: "Поделиться", trades: "Сделки", wr: "Винрейт", pnl: "PnL", wk: "7 дней", mo: "30 дней", day: "День", d1: "24 ч", style: "Стиль", setNick: "Установить никнейм (один раз)", change: "Запросить смену", pending: "Ожидает подтверждения админа", sent: "Запрос на смену отправлен админу", saved: "Никнейм сохранён" },
+  EN: { tradeP: "Trade", pick: "Choose trade", all: "All", pair: "Pair", dir: "Position", btn: "PnL card", title: "Share PnL card", nick: "Nickname", week: "Week", month: "Month", save: "Save to gallery", trades: "Trades", wr: "Win rate", pnl: "PnL", day: "Day", style: "Style", setNick: "Set nickname (once)", change: "Request change", pending: "Awaiting admin approval", sent: "Change request sent to admin", saved: "Nickname saved", noTrades: "No trades yet" },
+  UA: { tradeP: "Угода", pick: "Оберіть угоду", all: "Все", pair: "Пара", dir: "Позиція", btn: "PnL картка", title: "PnL картка", nick: "Нікнейм", week: "Тиждень", month: "Місяць", save: "Зберегти в галерею", trades: "Угоди", wr: "Вінрейт", pnl: "PnL", day: "День", style: "Стиль", setNick: "Встановити нікнейм (один раз)", change: "Запросити зміну", pending: "Очікує підтвердження адміна", sent: "Запит на зміну надіслано адміну", saved: "Нікнейм збережено", noTrades: "Угод ще немає" },
+  RU: { tradeP: "Сделка", pick: "Выберите сделку", all: "Всё", pair: "Пара", dir: "Позиция", btn: "PnL карточка", title: "PnL карточка", nick: "Никнейм", week: "Неделя", month: "Месяц", save: "Сохранить в галерею", trades: "Сделки", wr: "Винрейт", pnl: "PnL", day: "День", style: "Стиль", setNick: "Установить никнейм (один раз)", change: "Запросить смену", pending: "Ожидает подтверждения админа", sent: "Запрос на смену отправлен админу", saved: "Никнейм сохранён", noTrades: "Сделок пока нет" },
 } as const;
 
 function draw(opts: { variant: Variant; curve: number[]; nick: string; pct: number; label: string; range: string; trades: number; wr: number; dir?: string; pair?: string; tx: Record<keyof (typeof L)["EN"], string> }) {
@@ -26,52 +26,102 @@ function draw(opts: { variant: Variant; curve: number[]; nick: string; pct: numb
   c.width = W; c.height = H;
   const g = c.getContext("2d")!;
   const win = opts.pct >= 0;
+  const isLong = opts.dir === "Long";
+  const isShort = opts.dir === "Short";
   const bg = g.createLinearGradient(0, 0, W, H);
   const v = opts.variant;
-  if (v === "gold") { bg.addColorStop(0, "#0b0b0b"); bg.addColorStop(1, "#1c1608"); }
-  else if (v === "stripes") { bg.addColorStop(0, win ? "#052e1c" : "#2e0509"); bg.addColorStop(1, win ? "#0d5c3a" : "#5c0d14"); }
-  else if (v === "minimal") { bg.addColorStop(0, "#0b0e14"); bg.addColorStop(1, win ? "#0f2a1f" : "#2a0f12"); }
-  else if (v === "bold") { bg.addColorStop(0, win ? "#10b981" : "#ef4444"); bg.addColorStop(1, win ? "#022c1c" : "#2c0206"); }
-  else if (win) { bg.addColorStop(0, "#03140c"); bg.addColorStop(0.55, "#064e2b"); bg.addColorStop(1, "#10b981"); }
-  else { bg.addColorStop(0, "#1a0406"); bg.addColorStop(0.55, "#5c0f17"); bg.addColorStop(1, "#ef4444"); }
+  if (v === "gold") {
+    bg.addColorStop(0, "#090a0d");
+    bg.addColorStop(1, win ? (isShort ? "#111c1a" : "#1c1608") : "#1e0c10");
+  } else if (v === "bold") {
+    if (win) {
+      bg.addColorStop(0, isShort ? "#0d9488" : "#10b981");
+      bg.addColorStop(1, isShort ? "#042f2e" : "#022c1c");
+    } else {
+      bg.addColorStop(0, isShort ? "#be123c" : "#ef4444");
+      bg.addColorStop(1, "#240308");
+    }
+  } else if (win) {
+    bg.addColorStop(0, "#03140c");
+    bg.addColorStop(0.55, isShort ? "#064e4b" : "#064e2b");
+    bg.addColorStop(1, isShort ? "#14b8a6" : "#10b981");
+  } else {
+    bg.addColorStop(0, "#180406");
+    bg.addColorStop(0.55, isShort ? "#4c0519" : "#5c0f17");
+    bg.addColorStop(1, isShort ? "#e11d48" : "#ef4444");
+  }
   g.fillStyle = bg; g.fillRect(0, 0, W, H);
-  // glow
-  const glow = g.createRadialGradient(W * 0.8, H * 0.3, 0, W * 0.8, H * 0.3, 700);
-  glow.addColorStop(0, win ? "rgba(52,211,153,0.45)" : "rgba(248,113,113,0.45)");
-  glow.addColorStop(1, "rgba(0,0,0,0)");
-  if (v === "neon" || v === "bold") { g.fillStyle = glow; g.fillRect(0, 0, W, H); }
-  // grid
-  g.strokeStyle = "rgba(255,255,255,0.05)"; g.lineWidth = 1;
-  if (v === "minimal") { g.fillStyle = win ? "#10b981" : "#ef4444"; g.fillRect(0, 0, 16, H); }
-  if (v === "stripes") { g.save(); g.strokeStyle = win ? "rgba(52,211,153,0.12)" : "rgba(248,113,113,0.12)"; g.lineWidth = 40; for (let x = -H; x < W; x += 110) { g.beginPath(); g.moveTo(x, H); g.lineTo(x + H, 0); g.stroke(); } g.restore(); }
-  if (v === "gold") { g.strokeStyle = "#f0b90b"; g.lineWidth = 6; g.strokeRect(40, 40, W - 80, H - 80); }
-  g.strokeStyle = "rgba(255,255,255,0.05)"; g.lineWidth = 1;
-  if (v === "neon" || v === "minimal") for (let x = 0; x < W; x += 60) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, H); g.stroke(); }
-  if (v === "neon" || v === "minimal") for (let y = 0; y < H; y += 60) { g.beginPath(); g.moveTo(0, y); g.lineTo(W, y); g.stroke(); }
-  // chart line
-  g.beginPath(); g.lineWidth = 8; g.strokeStyle = win ? "rgba(167,243,208,0.8)" : "rgba(254,202,202,0.8)";
-  const cv = [0, ...opts.curve];
-  const mn = Math.min(...cv), mx = Math.max(...cv), span = mx - mn || 1;
-  if (v === "gold") g.strokeStyle = "#f0b90b";
-  if (v !== "bold") {
-    cv.forEach((p, i) => { const x = 80 + (i * (W - 160)) / Math.max(cv.length - 1, 1); const y = 940 - ((p - mn) / span) * 280; i ? g.lineTo(x, y) : g.moveTo(x, y); });
+
+  // Variant-specific background geometry
+  if (v === "neon") {
+    const gx = isShort ? W * 0.2 : W * 0.82;
+    const gy = isShort ? H * 0.65 : H * 0.28;
+    const glow = g.createRadialGradient(gx, gy, 0, gx, gy, 720);
+    glow.addColorStop(0, win ? (isShort ? "rgba(45,212,191,0.45)" : "rgba(52,211,153,0.48)") : "rgba(248,113,113,0.48)");
+    glow.addColorStop(1, "rgba(0,0,0,0)");
+    g.fillStyle = glow; g.fillRect(0, 0, W, H);
+    g.strokeStyle = "rgba(255,255,255,0.05)"; g.lineWidth = 1;
+    for (let x = 0; x < W; x += 60) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, H); g.stroke(); }
+    for (let y = 0; y < H; y += 60) { g.beginPath(); g.moveTo(0, y); g.lineTo(W, y); g.stroke(); }
+  } else if (v === "bold") {
+    g.save();
+    g.fillStyle = "rgba(0,0,0,0.22)";
+    g.beginPath();
+    if (isShort) { g.moveTo(0, 0); g.lineTo(W, 0); g.lineTo(W, H * 0.42); g.lineTo(0, H * 0.22); }
+    else { g.moveTo(0, H * 0.78); g.lineTo(W, H * 0.56); g.lineTo(W, H); g.lineTo(0, H); }
+    g.closePath(); g.fill();
+    g.restore();
+  } else if (v === "gold") {
+    const accent = win ? "#f0b90b" : "#f6465d";
+    g.save();
+    g.strokeStyle = win ? "rgba(240,185,11,0.07)" : "rgba(246,70,93,0.08)";
+    g.lineWidth = 24;
+    for (let x = -H; x < W; x += 100) {
+      g.beginPath();
+      if (isShort) { g.moveTo(x, 0); g.lineTo(x + H, H); }
+      else { g.moveTo(x, H); g.lineTo(x + H, 0); }
+      g.stroke();
+    }
+    g.restore();
+    g.strokeStyle = accent; g.lineWidth = 6; g.strokeRect(40, 40, W - 80, H - 80);
+    g.strokeStyle = "rgba(255,255,255,0.14)"; g.lineWidth = 2; g.strokeRect(58, 58, W - 116, H - 116);
+  }
+
+  // Direction watermark chevron or equity curve
+  if (opts.dir) {
+    g.save();
+    g.globalAlpha = v === "bold" ? 0.14 : 0.2;
+    g.strokeStyle = win ? (v === "gold" ? "#f0b90b" : "#6ee7b7") : "#fca5a5";
+    g.lineWidth = 18; g.lineCap = "round"; g.lineJoin = "round";
+    const cy = 790;
+    if (isLong) {
+      g.beginPath(); g.moveTo(140, cy + 120); g.lineTo(440, cy + 20); g.lineTo(620, cy + 80); g.lineTo(940, cy - 110); g.stroke();
+      g.beginPath(); g.moveTo(860, cy - 115); g.lineTo(940, cy - 110); g.lineTo(920, cy - 30); g.stroke();
+    } else {
+      g.beginPath(); g.moveTo(140, cy - 110); g.lineTo(440, cy - 10); g.lineTo(620, cy - 70); g.lineTo(940, cy + 120); g.stroke();
+      g.beginPath(); g.moveTo(860, cy + 125); g.lineTo(940, cy + 120); g.lineTo(920, cy + 40); g.stroke();
+    }
+    g.restore();
+  } else if (v !== "bold") {
+    g.beginPath(); g.lineWidth = 8;
+    g.strokeStyle = v === "gold" ? (win ? "#f0b90b" : "#f6465d") : win ? "rgba(167,243,208,0.8)" : "rgba(254,202,202,0.8)";
+    const cv = [0, ...opts.curve];
+    const mn = Math.min(...cv), mx = Math.max(...cv), span = mx - mn || 1;
+    cv.forEach((p, i) => {
+      const x = 80 + (i * (W - 160)) / Math.max(cv.length - 1, 1);
+      const y = 940 - ((p - mn) / span) * 280;
+      if (i) g.lineTo(x, y); else g.moveTo(x, y);
+    });
     g.stroke();
   }
 
   if (opts.dir) {
-    const long = opts.dir === "Long";
-    // direction accent: Long = rising wedge bottom-left, Short = falling wedge top-right
-    g.save(); g.globalAlpha = 0.18; g.fillStyle = win ? "#34d399" : "#f87171";
-    g.beginPath();
-    if (long) { g.moveTo(0, H); g.lineTo(W, H * 0.55); g.lineTo(W, H); }
-    else { g.moveTo(0, 0); g.lineTo(W, 0); g.lineTo(W, H * 0.45); }
-    g.closePath(); g.fill(); g.restore();
-    const txt = `${long ? "▲ LONG" : "▼ SHORT"}${opts.pair ? "  " + opts.pair : ""}`;
+    const txt = `${isLong ? "▲ LONG" : "▼ SHORT"}${opts.pair ? "  ·  " + opts.pair : ""}`;
     g.font = "bold 40px 'JetBrains Mono', monospace";
-    const w = g.measureText(txt).width + 60;
-    g.fillStyle = long ? "rgba(16,185,129,0.9)" : "rgba(239,68,68,0.9)";
-    g.beginPath(); g.roundRect(80, 250, w, 76, 38); g.fill();
-    g.fillStyle = "#ffffff"; g.fillText(txt, 110, 302);
+    const w = g.measureText(txt).width + 64;
+    g.fillStyle = isLong ? "rgba(16,185,129,0.92)" : "rgba(239,68,68,0.92)";
+    g.beginPath(); g.roundRect(80, 245, w, 78, 39); g.fill();
+    g.fillStyle = "#ffffff"; g.fillText(txt, 112, 298);
   }
   g.fillStyle = "#ffffff";
   g.font = "bold 56px 'JetBrains Mono', monospace";
@@ -83,17 +133,20 @@ function draw(opts: { variant: Variant; curve: number[]; nick: string; pct: numb
   if (!opts.dir) g.fillText(opts.tx.pnl, 80, 380);
   const pctText = `${win ? "+" : ""}${opts.pct.toFixed(2)}%`;
   g.fillStyle = v === "bold" ? "#ffffff" : v === "gold" ? (win ? "#f0b90b" : "#f6465d") : win ? "#6ee7b7" : "#fca5a5";
-  if (v === "bold") { g.font = "bold 230px 'JetBrains Mono', monospace"; g.textAlign = "center"; g.fillText(pctText, W / 2, 720); g.textAlign = "left"; }
-  else { g.font = "bold 170px 'JetBrains Mono', monospace"; g.fillText(pctText, 70, 560); }
+  if (v === "bold") { g.font = "bold 220px 'JetBrains Mono', monospace"; g.textAlign = "center"; g.fillText(pctText, W / 2, 650); g.textAlign = "left"; }
+  else { g.font = "bold 170px 'JetBrains Mono', monospace"; g.fillText(pctText, 70, 550); }
 
-  g.fillStyle = "rgba(0,0,0,0.35)";
+  g.fillStyle = "rgba(0,0,0,0.4)";
   g.beginPath(); g.roundRect(80, 1000, W - 160, 200, 28); g.fill();
   g.font = "34px sans-serif"; g.fillStyle = "rgba(255,255,255,0.7)";
-  g.fillText(opts.tx.nick, 120, 1065); g.fillText(opts.tx.trades, 560, 1065); g.fillText(opts.tx.wr, 800, 1065);
-  g.font = "bold 50px 'JetBrains Mono', monospace"; g.fillStyle = "#ffffff";
+  g.fillText(opts.tx.nick, 120, 1065);
+  g.fillText(opts.dir ? opts.tx.pair : opts.tx.trades, 540, 1065);
+  g.fillText(opts.dir ? opts.tx.dir : opts.tx.wr, 800, 1065);
+  g.font = "bold 48px 'JetBrains Mono', monospace"; g.fillStyle = "#ffffff";
   g.fillText((opts.nick || "—").slice(0, 14), 120, 1145);
-  g.fillText(String(opts.trades), 560, 1145);
-  g.fillText(`${opts.wr.toFixed(0)}%`, 800, 1145);
+  g.fillText(opts.dir ? (opts.pair || "—").slice(0, 10) : String(opts.trades), 540, 1145);
+  g.fillStyle = opts.dir ? (isLong ? "#34d399" : "#f87171") : "#ffffff";
+  g.fillText(opts.dir ? opts.dir.toUpperCase() : `${opts.wr.toFixed(0)}%`, 800, 1145);
 
   g.font = "28px sans-serif"; g.fillStyle = "rgba(255,255,255,0.5)";
   g.fillText(opts.range, 80, 1280);
@@ -117,16 +170,20 @@ export function PnlCardDialog({ trades }: { trades: Trade[] }) {
   const recent = useMemo(() => [...trades].filter((t) => t.outcome !== "Missed").sort((a, b) => b.traded_at.localeCompare(a.traded_at)).slice(0, 50), [trades]);
   const [tradeId, setTradeId] = useState<string>("");
   const one = period === "Trade" ? recent.find((t) => t.id === tradeId) ?? recent[0] : undefined;
-  const periodTrades = useMemo(() => (period === "Trade" ? (one ? [one] : []) : filterTrades(trades, "All", period)), [trades, period, one]);
+  const periodTrades = useMemo(
+    () => (period === "Trade" ? (one ? [one] : []) : filterTrades(trades, "All", period)),
+    [trades, period, one],
+  );
   const stats = useMemo(() => computeStats(periodTrades), [periodTrades]);
   const curve = useMemo(() => equityCurve(periodTrades).map((p) => p.r), [periodTrades]);
   const pct = stats.totalR; // 1R = 1%
-  const label = period === "Trade" ? tx.tradeP : period === "Daily" ? tx.day : period === "Weekly" ? tx.week : tx.month;
+  const label = period === "Trade" ? tx.tradeP : period === "Daily" ? tx.day : period === "Weekly" ? tx.week : period === "Monthly" ? tx.month : tx.all;
   const range = useMemo(() => {
     if (period === "Trade") return one ? new Date(one.traded_at).toLocaleDateString("uk-UA") : "—";
     const end = new Date();
-    const start = new Date(end.getTime() - TIMEFRAME_DAYS[period as Exclude<Period, "Trade">] * 86400000);
     const f = (d: Date, y = true) => d.toLocaleDateString("uk-UA", { day: "2-digit", month: "2-digit", ...(y ? { year: "numeric" } : {}) });
+    if (period === "Overall") return f(end);
+    const start = new Date(end.getTime() - TIMEFRAME_DAYS[period as Exclude<Period, "Trade">] * 86400000);
     return period === "Daily" ? f(end) : `${f(start, false)} – ${f(end)}`;
   }, [period, open, one]);
 
@@ -162,21 +219,25 @@ export function PnlCardDialog({ trades }: { trades: Trade[] }) {
       </DialogTrigger>
       <DialogContent className="max-h-[95vh] overflow-y-auto sm:max-w-md">
         <DialogHeader><DialogTitle>{tx.title}</DialogTitle></DialogHeader>
-        <div className="grid grid-cols-4 gap-2">
-          {(["Trade", "Daily", "Weekly", "Monthly"] as Period[]).map((p) => (
-            <Button key={p} variant={period === p ? "default" : "outline"} size="sm" onClick={() => setPeriod(p)}>
-              {p === "Trade" ? tx.tradeP : p === "Daily" ? tx.day : p === "Weekly" ? tx.week : tx.month}
+        <div className="grid grid-cols-5 gap-1.5">
+          {(["Trade", "Daily", "Weekly", "Monthly", "Overall"] as Period[]).map((p) => (
+            <Button key={p} variant={period === p ? "default" : "outline"} size="sm" className="px-1.5 text-xs" onClick={() => setPeriod(p)}>
+              {p === "Trade" ? tx.tradeP : p === "Daily" ? tx.day : p === "Weekly" ? tx.week : p === "Monthly" ? tx.month : tx.all}
             </Button>
           ))}
         </div>
         {period === "Trade" && (
           <div className="space-y-1">
             <Label>{tx.pick}</Label>
-            <select className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm" value={one?.id ?? ""} onChange={(e) => setTradeId(e.target.value)}>
-              {recent.map((t) => (
-                <option key={t.id} value={t.id}>{new Date(t.traded_at).toLocaleDateString("uk-UA")} · {t.pair} · {t.direction} · {Number(t.realized_r) > 0 ? "+" : ""}{Number(t.realized_r)}R</option>
-              ))}
-            </select>
+            {recent.length === 0 ? (
+              <p className="text-xs text-muted-foreground">{tx.noTrades}</p>
+            ) : (
+              <select className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm" value={one?.id ?? ""} onChange={(e) => setTradeId(e.target.value)}>
+                {recent.map((t) => (
+                  <option key={t.id} value={t.id}>{new Date(t.traded_at).toLocaleDateString("uk-UA")} · {t.pair} · {t.direction} · {Number(t.realized_r) > 0 ? "+" : ""}{Number(t.realized_r)}R</option>
+                ))}
+              </select>
+            )}
           </div>
         )}
         <div className="space-y-1">

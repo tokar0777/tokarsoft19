@@ -1,5 +1,5 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
-import { Activity, ArrowRight, Send, Youtube } from "lucide-react";
+import { Activity, ArrowRight } from "lucide-react";
 import { LANGS, useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 
@@ -115,32 +115,6 @@ function LandingPage() {
       <footer className="border-t border-border">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-6 md:px-8">
           <p className="text-xs text-muted-foreground">© 2026 TOKARsoft19</p>
-          <div className="flex items-center gap-2">
-            <a
-              href="https://t.me/tokartrading"
-              target="_blank"
-              rel="noreferrer noopener"
-              className="flex items-center gap-2 rounded-md border border-border px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:text-primary"
-            >
-              <Send className="size-3.5" /> {t("shell.telegram")}
-            </a>
-            <a
-              href="https://t.me/vadyaa_77"
-              target="_blank"
-              rel="noreferrer noopener"
-              className="flex items-center gap-2 rounded-md border border-border px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:text-primary"
-            >
-              <Send className="size-3.5" /> {t("shell.support")}
-            </a>
-            <a
-              href="https://youtube.com/@tokarsss?si=Y3kig7daZaRmPxTi"
-              target="_blank"
-              rel="noreferrer noopener"
-              className="flex items-center gap-2 rounded-md border border-border px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:text-primary"
-            >
-              <Youtube className="size-3.5" /> {t("shell.youtube")}
-            </a>
-          </div>
         </div>
       </footer>
     </div>
